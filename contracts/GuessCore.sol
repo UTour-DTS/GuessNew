@@ -51,7 +51,7 @@ contract GuessCore is ProductOwnership {
     /// @notice Creates the main CryptoKitties smart contract instance.
     constructor () public {
         // Starts paused.
-        paused = true;
+        // paused = true;
 
         // the creator of the contract is the initial CEO
         ceoAddress = msg.sender;
@@ -69,11 +69,11 @@ contract GuessCore is ProductOwnership {
     ///  contract to update to the new contract address in that case. (This contract will
     ///  be paused indefinitely if such an upgrade takes place.)
     /// @param _v2Address new address
-    function setNewAddress(address _v2Address) external onlyCEO whenPaused {
-        // See README.md for updgrade plan
-        newContractAddress = _v2Address;
-        emit ContractUpgrade(_v2Address);
-    }
+    // function setNewAddress(address _v2Address) external onlyCEO whenPaused {
+    //     // See README.md for updgrade plan
+    //     newContractAddress = _v2Address;
+    //     emit ContractUpgrade(_v2Address);
+    // }
 /*
     /// @notice No tipping!
     /// @dev Reject all Ether from being sent here, unless it's from one of the
