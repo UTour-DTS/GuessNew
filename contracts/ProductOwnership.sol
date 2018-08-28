@@ -4,7 +4,7 @@ import 'openzeppelin-solidity/contracts/token/ERC721/ERC721.sol';
 import './ProductFactory.sol';
 
 
-contract GuessOwnership is ProductFactory, ERC721 {
+contract ProductOwnership is ProductFactory, ERC721 {
     
     /// @dev name and symbol of the token, as defined in ERC721.
     string public constant name = "Guess";
