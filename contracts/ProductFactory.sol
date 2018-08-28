@@ -1,8 +1,11 @@
 pragma solidity ^0.4.24;
 
+import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
+import './GuessAccessControl.sol';
+
 /// @title Base contract for Guess. Holds all common structs, events and base variables.
 /// @author lihongzhen
-contract ProductFactory is GuessAccessControl {
+contract ProductFactory is GuessAccessControl{
     /*** EVENTS ***/
 
     /// @dev create new product, will start a new game
@@ -81,7 +84,7 @@ contract ProductFactory is GuessAccessControl {
 
     /// @dev The address of the ClockAuction contract that handles sales of Product. 
     ///  The Players can sale the Product which they win.
-    SaleClockAuction public saleAuction;
+    // SaleClockAuction public saleAuction;
 
     /// @dev Assigns ownership of a specific Product to an address.
     function _transfer(address _from, address _to, uint256 _tokenId) internal {
@@ -117,7 +120,7 @@ contract ProductFactory is GuessAccessControl {
         string _disc, 
         string _discEn, 
         uint256 _price, 
-        uint256 _percent,
+        uint32 _percent,
         uint64 _starttime,
         address _owner
     )
@@ -135,8 +138,7 @@ contract ProductFactory is GuessAccessControl {
             price: _price,
             percent: _percent,
             lastestTime: _starttime,
-            createTime: uint64(now),
-            owner: _owner
+            createTime: uint64(now)
         });
 
         uint256 newProductId = products.push(_product) - 1;
