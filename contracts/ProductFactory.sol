@@ -5,7 +5,7 @@ import './GuessAccessControl.sol';
 
 /// @title Base contract for Guess. Holds all common structs, events and base variables.
 /// @author lihongzhen
-contract ProductFactory is GuessAccessControl{
+contract ProductFactory is GuessAccessControl {
     /*** EVENTS ***/
 
     /// @dev create new product, will start a new game
