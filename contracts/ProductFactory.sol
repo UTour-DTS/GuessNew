@@ -1,7 +1,9 @@
 pragma solidity ^0.4.24;
 
-import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
+// import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
+import './Ownable.sol';
 import './GuessAccessControl.sol';
+import './SaleClockAuction.sol';
 
 /// @title Base contract for Guess. Holds all common structs, events and base variables.
 /// @author lihongzhen
@@ -84,7 +86,11 @@ contract ProductFactory is GuessAccessControl {
 
     /// @dev The address of the ClockAuction contract that handles sales of Product. 
     ///  The Players can sale the Product which they win.
-    // SaleClockAuction public saleAuction;
+    SaleClockAuction public saleAuction;
+
+    /// @dev The address of a custom subclassed contract that handles Guess
+    ///  auctions.
+    // GuessBid public guessBid;
 
     /// @dev Assigns ownership of a specific Product to an address.
     function _transfer(address _from, address _to, uint256 _tokenId) internal {

@@ -1,7 +1,8 @@
 pragma solidity ^0.4.24;
 
-import 'openzeppelin-solidity/contracts/token/ERC721/ERC721.sol';
+// import 'openzeppelin-solidity/contracts/token/ERC721/ERC721.sol';
 import './ProductFactory.sol';
+import './ERC721.sol';
 
 
 contract ProductOwnership is ProductFactory, ERC721 {
@@ -22,8 +23,7 @@ contract ProductOwnership is ProductFactory, ERC721 {
         bytes4(keccak256('approve(address,uint256)')) ^
         bytes4(keccak256('transfer(address,uint256)')) ^
         bytes4(keccak256('transferFrom(address,address,uint256)')) ^
-        bytes4(keccak256('tokensOfOwner(address)')) ^
-        bytes4(keccak256('tokenMetadata(uint256,string)'));
+        bytes4(keccak256('tokensOfOwner(address)'));
 
     /// @notice Introspection interface as per ERC-165 (https://github.com/ethereum/EIPs/issues/165).
     ///  Returns true for any standardized interfaces implemented by this contract. We implement
@@ -110,7 +110,7 @@ contract ProductOwnership is ProductFactory, ERC721 {
         address _to,
         uint256 _tokenId
     )
-        public // external
+        external
         // whenNotPaused
     {
         // Only an owner can grant transfer approval.
@@ -135,7 +135,7 @@ contract ProductOwnership is ProductFactory, ERC721 {
         address _to,
         uint256 _tokenId
     )
-        public // external
+        external
         // whenNotPaused
     {
         // Safety check to prevent against an unexpected 0x0 default.
@@ -160,7 +160,7 @@ contract ProductOwnership is ProductFactory, ERC721 {
     /// @notice Returns the address currently assigned ownership of a given Product.
     /// @dev Required for ERC-721 compliance.
     function ownerOf(uint256 _tokenId)
-        public
+        external
         view
         returns (address owner)
     {
