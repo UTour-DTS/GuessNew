@@ -1,0 +1,96 @@
+pragma solidity ^0.4.24;
+
+
+contract ERC20 {
+
+}
+
+contract GuessStrategy {
+
+    /// @dev The ERC-165 interface signature for ERC-721.
+    ///  Ref: https://github.com/ethereum/EIPs/issues/165
+    ///  Ref: https://github.com/ethereum/EIPs/issues/721
+    bytes4 constant InterfaceSignature_ERC721 = bytes4(0x9a20483d);
+
+    /// @dev stragey id, each strategy reflect one product
+    uint256 _strategyId; 
+
+    /// @dev distribute scheme
+
+    struct Strategy {
+        /// @dev productid 
+        uint256 product_id;
+        /// @dev the percent of owner 拥有者分成（0-50%）
+        uint256 owner_percent;
+        /// @dev percent of platform 平台分成（2%）
+        uint256 platform_percent;
+        /// @dev 邀请者分成（10%）
+        uint256 inviter_percent;
+        /// @dev 空投分成（10%）
+        uint256 airdrop_percent;
+        /// @dev 参与者分成（所有剩余的百分比）
+        uint256 participant_percent;
+        /// @dev 最晚开始时间
+        uint64 lastestTime;
+        /// @dev 创建时间
+        uint64 createTime;
+        /// @dev 开奖时间
+        uint64 endTime;
+        /// @dev 是否开奖
+        bool is_open_a_prize;
+    }
+
+    Strategy[] strageies;
+
+    mapping(stid => playerdata[ id, price, time]);
+
+    player {
+        valaut: {
+            airdrop:
+            stage:
+            aff:
+        }   
+    }
+
+
+    constructor(address _nftAddress) {
+
+        ERC721 candidateContract = ERC721(_nftAddress);
+        require(candidateContract.supportsInterface(InterfaceSignature_ERC721));
+        nonFungibleContract = candidateContract;
+
+    }
+
+    function _createStrategy (
+        uint256 _productID,
+        uint256 _owner_percent, 
+        uint256 _platform_percent,
+        uint256 _inviter_percent,
+        uint256 _airdrop_percent,
+        uint256 _participant_percent) 
+        external 
+        returns(uint256 strategyId)
+    {
+        
+
+    }
+
+    function _guess() external payable {
+
+    }
+
+    function _endStrategy() returns (bool isEnd) {
+
+    }
+
+    function _calWinner() {
+        
+    }
+
+    function _distribute() external {
+
+    }
+
+    function _
+
+}

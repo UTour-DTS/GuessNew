@@ -1,9 +1,10 @@
 pragma solidity ^0.4.24;
 
 // import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
-import './Ownable.sol';
 import './GuessAccessControl.sol';
 import './SaleClockAuction.sol';
+
+
 
 /// @title Base contract for Guess. Holds all common structs, events and base variables.
 /// @author lihongzhen
@@ -18,9 +19,7 @@ contract ProductFactory is GuessAccessControl {
         string _nameEn, 
         string _disc, 
         string _discEn, 
-        uint256 _price,
-        uint32 _percent,
-        uint64 _starttime
+        uint256 _price
         );
 
     /// @dev Transfer event as defined in current draft of ERC721. Emitted every time a product
@@ -50,14 +49,8 @@ contract ProductFactory is GuessAccessControl {
         // reference price for the market.
         uint256 price;
 
-        // percent of merchant will withdraw.
-        uint32 percent;
-
         // The timestamp from the block when this cat came into existence.
         uint64 createTime;
-
-        // The latest timestamp of game will start.
-        uint64 lastestTime;
     }
 
     /*** CONSTANTS ***/
@@ -88,10 +81,6 @@ contract ProductFactory is GuessAccessControl {
     ///  The Players can sale the Product which they win.
     SaleClockAuction public saleAuction;
 
-    /// @dev The address of a custom subclassed contract that handles Guess
-    ///  auctions.
-    // GuessBid public guessBid;
-
     /// @dev Assigns ownership of a specific Product to an address.
     function _transfer(address _from, address _to, uint256 _tokenId) internal {
         // Since the number of products is capped to 2^32 we can't overflow this
@@ -117,8 +106,6 @@ contract ProductFactory is GuessAccessControl {
     /// @param _disc The discription of product in Chinese.
     /// @param _discEn The discription of product in English.
     /// @param _price The reference price of Product for the market.
-    /// @param _percent The percent of merchant will withdraw.
-    /// @param _starttime The lastest time when game will start.
     /// @param _owner The inital owner of this product, must be non-zero.
     function _createProduct(
         string _name, 
@@ -126,8 +113,6 @@ contract ProductFactory is GuessAccessControl {
         string _disc, 
         string _discEn, 
         uint256 _price, 
-        uint32 _percent,
-        uint64 _starttime,
         address _owner
     )
         internal
@@ -142,8 +127,6 @@ contract ProductFactory is GuessAccessControl {
             disc: _disc,
             discEn: _discEn,
             price: _price,
-            percent: _percent,
-            lastestTime: _starttime,
             createTime: uint64(now)
         });
 
@@ -157,9 +140,7 @@ contract ProductFactory is GuessAccessControl {
             _nameEn,
             _disc,
             _discEn,
-            _price,
-            _percent,
-            _starttime
+            _price
         );
 
         // This will assign ownership, and also emit the Transfer event as
