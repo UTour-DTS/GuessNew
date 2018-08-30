@@ -111,7 +111,7 @@ contract ProductFactory is GuessAccessControl {
         string _nameEn, 
         string _disc, 
         string _discEn, 
-        uint256 _price, 
+        uint256 _price,
         address _owner
     )
         internal

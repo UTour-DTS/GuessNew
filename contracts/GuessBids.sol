@@ -88,14 +88,6 @@ contract GuessBids is ProductOwnership, GuessEvents {
     GuessDatasets.Divide private divide_; 
 
 //==============================================================================
-// initial data setup upon contract deploy
-//==============================================================================
-    // constructor () public
-    // {
-    //     divide_ = GuessDatasets.Divide(2, 10, 10);
-    // }
-
-//==============================================================================
 // these are safety checks
 // modifiers
 //==============================================================================
@@ -192,9 +184,68 @@ contract GuessBids is ProductOwnership, GuessEvents {
         saleAuction.withdrawBalance();
     }
 
+    // @dev set player divide
+    function setDivide(uint256 _fnd, uint256 _aff, uint256 _airdrop) external onlyCEO {
+        divide_ = GuessDatasets.Divide(_fnd, _aff, _airdrop);
+    }
+
 //==============================================================================
 // use these to interact with contract
 //====|=========================================================================
+    /** @dev create r
+     */
+    function createRound(
+        string _name, 
+        string _nameEn, 
+        string _disc, 
+        string _discEn, 
+        uint256 _price,
+        uint256 _percent,
+        uint256 _maxPlayer,
+        uint256 _lastStartTime
+    ) external onlyMCH returns (uint256 roundID) { 
+        uint256 pid = _createProduct(_name, _nameEn, _disc, _discEn, _price, msg.sender);  
+        uint256 rid = _createRound(pid, _percent, _maxPlayer, _lastStartTime); 
+        return rid;   
+    }
+
+    function _createRound (
+        uint256 _pid,       
+        uint256 _percent,
+        uint256 _maxPlayer,
+        uint256 _lastStartTime
+    ) 
+        internal
+        returns(uint256 rid) 
+    {
+        GuessDatasets.Round memory _round = GuessDatasets.Round({
+            plyrCount: 0,
+            plyrMaxCount: _maxPlayer,
+            prdctID: _pid,
+            percent: _percent,
+
+            airdrop: 0, 
+            eth: 0, 
+            pot: 0, 
+
+            strt: _lastStartTime,
+            end: 0,
+
+            price: 0,
+            winPrice: 0, 
+            plyr: 0,  
+            team: 0,
+            ended: false
+        });
+
+        rID_++;
+        round_[rID_] = _round;
+
+        emit GuessEvents.OnNewRound(rID_);
+
+        return rID_;
+    }
+    
     /**
      * @dev converts all incoming ethereum to keys.
      * @param _price price of player guess
@@ -723,7 +774,6 @@ contract GuessBids is ProductOwnership, GuessEvents {
         activated_ = true;
         
         // lets start first round
-		rID_ = 1;
+        rID_ = 1;
     }
-    
 }

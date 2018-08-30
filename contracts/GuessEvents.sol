@@ -18,6 +18,10 @@ contract GuessEvents {
         uint256 amountPaid,
         uint256 timeStamp
     );
+
+    event OnNewRound (
+        uint256 rid
+    );
     
     // fired at end of buy or reload
     event OnEndTx

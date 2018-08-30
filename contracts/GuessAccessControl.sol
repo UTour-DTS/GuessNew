@@ -2,12 +2,12 @@ pragma solidity ^0.4.24;
 
 // import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 
-import "./Ownable.sol";
+// import "./Ownable.sol";
 
 
 /// @title A facet of GuessCore that manages special access privileges.
 /// @author lihongzhen
-contract GuessAccessControl is Ownable{
+contract GuessAccessControl {
     // This facet controls access control for Guess. There are four roles managed here:
     //
     //     - The CEO: The CEO can reassign other roles and change the addresses of our dependent smart
