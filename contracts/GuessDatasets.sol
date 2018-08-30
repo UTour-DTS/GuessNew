@@ -25,8 +25,8 @@ library GuessDatasets {
     struct Round {
         uint256 plyrCount; // joined players count
         uint256 plyrMaxCount; // max players joined, if players count more than this number, round would be over
-        uint256 minUTO; // min amount of token holding
         uint256 prdctID; // productID
+        uint256 percent; // percent to tetants    
 
         uint256 airdrop;   // airdrop 
         uint256 eth;    // total eth

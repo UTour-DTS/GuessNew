@@ -1,8 +1,8 @@
 pragma solidity ^0.4.24;
 
-// import 'openzeppelin-solidity/contracts/token/ERC721/ERC721.sol';
-import './ProductFactory.sol';
-import './ERC721.sol';
+// import "openzeppelin-solidity/contracts/token/ERC721/ERC721.sol";
+import "./ProductFactory.sol";
+import "./ERC721.sol";
 
 
 contract ProductOwnership is ProductFactory, ERC721 {
@@ -12,18 +12,18 @@ contract ProductOwnership is ProductFactory, ERC721 {
     string public constant symbol = "GUESS";
 
     bytes4 constant InterfaceSignature_ERC165 =
-        bytes4(keccak256('supportsInterface(bytes4)'));
+        bytes4(keccak256("supportsInterface(bytes4)"));
 
     bytes4 constant InterfaceSignature_ERC721 =
-        bytes4(keccak256('name()')) ^
-        bytes4(keccak256('symbol()')) ^
-        bytes4(keccak256('totalSupply()')) ^
-        bytes4(keccak256('balanceOf(address)')) ^
-        bytes4(keccak256('ownerOf(uint256)')) ^
-        bytes4(keccak256('approve(address,uint256)')) ^
-        bytes4(keccak256('transfer(address,uint256)')) ^
-        bytes4(keccak256('transferFrom(address,address,uint256)')) ^
-        bytes4(keccak256('tokensOfOwner(address)'));
+        bytes4(keccak256("name()")) ^
+        bytes4(keccak256("symbol()")) ^
+        bytes4(keccak256("totalSupply()")) ^
+        bytes4(keccak256("balanceOf(address)")) ^
+        bytes4(keccak256("ownerOf(uint256)")) ^
+        bytes4(keccak256("approve(address,uint256)")) ^
+        bytes4(keccak256("transfer(address,uint256)")) ^
+        bytes4(keccak256("transferFrom(address,address,uint256)")) ^
+        bytes4(keccak256("tokensOfOwner(address)"));
 
     /// @notice Introspection interface as per ERC-165 (https://github.com/ethereum/EIPs/issues/165).
     ///  Returns true for any standardized interfaces implemented by this contract. We implement
@@ -171,7 +171,7 @@ contract ProductOwnership is ProductFactory, ERC721 {
 
     /// @notice Returns a list of all Product IDs assigned to an address.
     /// @param _owner The owner whose Products we are interested in.
-    /// @dev This method MUST NEVER be called by smart contract code. First, it's fairly
+    /// @dev This method MUST NEVER be called by smart contract code. First, it"s fairly
     ///  expensive (it walks the entire Product array looking for product belonging to owner),
     ///  but it also returns a dynamic array, which is only supported for web3 calls, and
     ///  not contract-to-contract calls.

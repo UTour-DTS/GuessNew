@@ -1,5 +1,6 @@
 pragma solidity ^0.4.24;
 
+
 contract ERC20{
     uint256 public totalSupply;
     

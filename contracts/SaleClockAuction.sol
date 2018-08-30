@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-import './ClockAuction.sol';
+import "./ClockAuction.sol";
 
 
 /// @title Clock auction modified for sale of kitties
@@ -16,7 +16,7 @@ contract SaleClockAuction is ClockAuction {
     uint256[5] public lastGen0SalePrices;
 
     // Delegate constructor
-    constructor (address _nftAddr, uint256 _cut) public
+    constructor (address _nftAddr, uint256 _cut) public 
         ClockAuction(_nftAddr, _cut) {}
 
     /// @dev Creates and begins a new auction.
@@ -25,7 +25,7 @@ contract SaleClockAuction is ClockAuction {
     /// @param _endingPrice - Price of item (in wei) at end of auction.
     /// @param _duration - Length of auction (in seconds).
     /// @param _seller - Seller, if not the message sender
-    function createAuction(
+    function createAuction (
         uint256 _tokenId,
         uint256 _startingPrice,
         uint256 _endingPrice,
@@ -34,7 +34,7 @@ contract SaleClockAuction is ClockAuction {
     )
         external
     {
-        // Sanity check that no inputs overflow how many bits we've allocated
+        // Sanity check that no inputs overflow how many bits we"ve allocated
         // to store them in the auction struct.
         require(_startingPrice == uint256(uint128(_startingPrice)));
         require(_endingPrice == uint256(uint128(_endingPrice)));

@@ -1,6 +1,7 @@
 pragma solidity ^0.4.24;
 
-import './GuessBids.sol';
+import "./GuessBids.sol";
+
 
 /// @title Guess: guess game on the Ethereum blockchain.
 /// @author lihongzhen
@@ -8,13 +9,13 @@ import './GuessBids.sol';
 contract GuessCore is GuessBids {
 
     // This is the main GuessCore contract. In order to keep our code seperated into logical sections,
-    // we've broken it up in two ways. First, we have several seperately-instantiated sibling contracts
+    // we"ve broken it up in two ways. First, we have several seperately-instantiated sibling contracts
     // that handle auctions and our super-top-secret genetic combination algorithm. The auctions are
-    // seperate since their logic is somewhat complex and there's always a risk of subtle bugs. By keeping
+    // seperate since their logic is somewhat complex and there"s always a risk of subtle bugs. By keeping
     // them in their own contracts, we can upgrade them without disrupting the main contract that tracks
     // product ownership. The genetic combination algorithm is kept seperate so we can open-source all of
     // the rest of our code without making it _too_ easy for fol\]uutyRks to figure out how the genetics work.
-    // Don't worry, I'm sure someone will reverse engineer it soon enough!
+    // Don"t worry, I"m sure someone will reverse engineer it soon enough!
     //
     // Secondly, we break the core contract into multiple files using inheritence, one for each major
     // facet of functionality of CK. This allows us to keep related code bundled together while still
@@ -42,7 +43,7 @@ contract GuessCore is GuessBids {
     //             We can make up to 5000 "promo" cats that can be given away (especially important when
     //             the community is new), and all others can only be created and then immediately put up
     //             for auction via an algorithmically determined starting price. Regardless of how they
-    //             are created, there is a hard limit of 50k gen0 cats. After that, it's all up to the
+    //             are created, there is a hard limit of 50k gen0 cats. After that, it"s all up to the
     //             community to breed, breed, breed!
 
     // Set in case the core contract is broken and an upgrade is required
@@ -59,13 +60,13 @@ contract GuessCore is GuessBids {
         // the creator of the contract is also the initial COO
         cooAddress = msg.sender;
 
-        // start with the mythical kitten 0 - so we don't have generation-0 parent issues
+        // start with the mythical kitten 0 - so we don"t have generation-0 parent issues
         // _createProduct(0, 0, 0, uint256(-1), address(0));
     }
 
     /// @dev Used to mark the smart contract as upgraded, in case there is a serious
     ///  breaking bug. This method does nothing but keep track of the new contract and
-    ///  emit a message indicating that the new address is set. It's up to clients of this
+    ///  emit a message indicating that the new address is set. It"s up to clients of this
     ///  contract to update to the new contract address in that case. (This contract will
     ///  be paused indefinitely if such an upgrade takes place.)
     /// @param _v2Address new address
@@ -76,7 +77,7 @@ contract GuessCore is GuessBids {
     }
 
     /// @notice No tipping!
-    /// @dev Reject all Ether from being sent here, unless it's from one of the
+    /// @dev Reject all Ether from being sent here, unless it"s from one of the
     ///  two auction contracts. (Hopefully, we can prevent user accidents.)
     // function() external payable {
     //     require(
@@ -104,7 +105,7 @@ contract GuessCore is GuessBids {
     ) {
         // Kitty storage kit = kitties[_id];
 
-        // // if this variable is 0 then it's not gestating
+        // // if this variable is 0 then it"s not gestating
         // isGestating = (kit.siringWithId != 0);
         // isReady = (kit.cooldownEndBlock <= block.number);
         // cooldownIndex = uint256(kit.cooldownIndex);
@@ -118,7 +119,7 @@ contract GuessCore is GuessBids {
     }
 
     /// @dev Override unpause so it requires all external contract addresses
-    ///  to be set before contract can be unpaused. Also, we can't have
+    ///  to be set before contract can be unpaused. Also, we can"t have
     ///  newContractAddress set either, because then the contract was upgraded.
     /// @notice This is public rather than external so we can call super.unpause
     ///  without using an expensive CALL.

@@ -1,7 +1,8 @@
 pragma solidity ^0.4.24;
 
-import './Pausable.sol';
-import './ClockAuctionBase.sol';
+import "./Pausable.sol";
+import "./ClockAuctionBase.sol";
+
 
 /// @title Clock auction for non-fungible tokens.
 /// @notice We omit a fallback function to prevent accidental sends to this contract.
@@ -18,7 +19,7 @@ contract ClockAuction is Pausable, ClockAuctionBase {
     ///  the Nonfungible Interface.
     /// @param _cut - percent cut the owner takes on each auction, must be
     ///  between 0-10,000.
-   constructor(address _nftAddress, uint256 _cut) public {
+    constructor(address _nftAddress, uint256 _cut) public {
         require(_cut <= 10000);
         ownerCut = _cut;
 
@@ -27,7 +28,7 @@ contract ClockAuction is Pausable, ClockAuctionBase {
         nonFungibleContract = candidateContract;
     }
 
-    /// @dev Remove all Ether from the contract, which is the owner's cuts
+    /// @dev Remove all Ether from the contract, which is the owner"s cuts
     ///  as well as any Ether sent directly to the contract address.
     ///  Always transfers to the NFT contract, but can be called either by
     ///  the owner or the NFT contract.
@@ -59,7 +60,7 @@ contract ClockAuction is Pausable, ClockAuctionBase {
         external
         whenNotPaused
     {
-        // Sanity check that no inputs overflow how many bits we've allocated
+        // Sanity check that no inputs overflow how many bits we"ve allocated
         // to store them in the auction struct.
         require(_startingPrice == uint256(uint128(_startingPrice)));
         require(_endingPrice == uint256(uint128(_endingPrice)));
@@ -90,7 +91,7 @@ contract ClockAuction is Pausable, ClockAuctionBase {
         _transfer(msg.sender, _tokenId);
     }
 
-    /// @dev Cancels an auction that hasn't been won yet.
+    /// @dev Cancels an auction that hasn"t been won yet.
     ///  Returns the NFT to original owner.
     /// @notice This is a state-modifying function that can
     ///  be called while the contract is paused.

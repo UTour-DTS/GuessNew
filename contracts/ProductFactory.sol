@@ -1,9 +1,8 @@
 pragma solidity ^0.4.24;
 
-// import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
-import './GuessAccessControl.sol';
-import './SaleClockAuction.sol';
-
+// import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "./GuessAccessControl.sol";
+import "./SaleClockAuction.sol";
 
 
 /// @title Base contract for Guess. Holds all common structs, events and base variables.
@@ -83,11 +82,11 @@ contract ProductFactory is GuessAccessControl {
 
     /// @dev Assigns ownership of a specific Product to an address.
     function _transfer(address _from, address _to, uint256 _tokenId) internal {
-        // Since the number of products is capped to 2^32 we can't overflow this
+        // Since the number of products is capped to 2^32 we can"t overflow this
         ownerProductCount[_to]++;
         // transfer ownership
         productToOwner[_tokenId] = _to;
-        // When creating new products _from is 0x0, but we can't account that address.
+        // When creating new products _from is 0x0, but we can"t account that address.
         if (_from != address(0)) {
             ownerProductCount[_from]--;
             // clear any previously approved ownership exchange
@@ -98,7 +97,7 @@ contract ProductFactory is GuessAccessControl {
     }
 
     /// @dev An internal method that creates a new product and stores it. This
-    ///  method doesn't do any checking and should only be called when the
+    ///  method doesn"t do any checking and should only be called when the
     ///  input data is known to be valid. Will generate both a CreateProduct event
     ///  and a Transfer event.
     /// @param _name The name of product in Chinese.
