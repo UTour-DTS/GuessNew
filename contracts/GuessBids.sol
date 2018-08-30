@@ -194,57 +194,58 @@ contract GuessBids is ProductOwnership, GuessEvents {
 //====|=========================================================================
     /** @dev create r
      */
-    function createRound(
-        string _name, 
-        string _nameEn, 
-        string _disc, 
-        string _discEn, 
-        uint256 _price,
-        uint256 _percent,
-        uint256 _maxPlayer,
-        uint256 _lastStartTime
-    ) external onlyMCH returns (uint256 roundID) { 
-        uint256 pid = _createProduct(_name, _nameEn, _disc, _discEn, _price, msg.sender);  
-        uint256 rid = _createRound(pid, _percent, _maxPlayer, _lastStartTime); 
-        return rid;   
-    }
+    // function createRound(
+    //     string _name, 
+    //     string _nameEn, 
+    //     string _disc, 
+    //     string _discEn, 
+    //     uint256 _price,
+    //     uint256 _percent,
+    //     uint256 _maxPlayer,
+    //     uint256 _lastStartTime
+    // ) external only returns (uint256 roundID) { 
+    //     uint256 pid = _createProduct(_name, _nameEn, _disc, _discEn, _price, msg.sender);  
+    //     // _createProduct(_name, _nameEn, _disc, _discEn, _price, msg.sender); 
+    //     uint256 rid = _createRound(pid, _percent, _maxPlayer, _lastStartTime); 
+    //     return rID_;   
+    // }
 
-    function _createRound (
-        uint256 _pid,       
-        uint256 _percent,
-        uint256 _maxPlayer,
-        uint256 _lastStartTime
-    ) 
-        internal
-        returns(uint256 rid) 
-    {
-        GuessDatasets.Round memory _round = GuessDatasets.Round({
-            plyrCount: 0,
-            plyrMaxCount: _maxPlayer,
-            prdctID: _pid,
-            percent: _percent,
+    // function _createRound (
+    //     uint256 _pid,       
+    //     uint256 _percent,
+    //     uint256 _maxPlayer,
+    //     uint256 _lastStartTime
+    // ) 
+    //     internal
+    //     returns(uint256 rid) 
+    // {
+    //     GuessDatasets.Round memory _round = GuessDatasets.Round({
+    //         plyrCount: 0,
+    //         plyrMaxCount: _maxPlayer,
+    //         prdctID: _pid,
+    //         percent: _percent,
 
-            airdrop: 0, 
-            eth: 0, 
-            pot: 0, 
+    //         airdrop: 0, 
+    //         eth: 0, 
+    //         pot: 0, 
 
-            strt: _lastStartTime,
-            end: 0,
+    //         strt: _lastStartTime,
+    //         end: 0,
 
-            price: 0,
-            winPrice: 0, 
-            plyr: 0,  
-            team: 0,
-            ended: false
-        });
+    //         price: 0,
+    //         winPrice: 0, 
+    //         plyr: 0,  
+    //         team: 0,
+    //         ended: false
+    //     });
 
-        rID_++;
-        round_[rID_] = _round;
+    //     rID_++;
+    //     round_[rID_] = _round;
 
-        emit GuessEvents.OnNewRound(rID_);
+    //     emit GuessEvents.OnNewRound(rID_);
 
-        return rID_;
-    }
+    //     return rID_;
+    // }
     
     /**
      * @dev converts all incoming ethereum to keys.
