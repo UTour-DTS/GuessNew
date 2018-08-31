@@ -1,9 +1,5 @@
 pragma solidity ^0.4.24;
 
-// import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
-
-// import "./Ownable.sol";
-
 
 /// @title A facet of GuessCore that manages special access privileges.
 /// @author lihongzhen

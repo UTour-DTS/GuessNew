@@ -81,7 +81,7 @@ contract ProductOwnership is ProductFactory, ERC721 {
         uint256 _tokenId
     )
         external
-        // whenNotPaused
+        whenNotPaused
     {
         // Safety check to prevent against an unexpected 0x0 default.
         require(_to != address(0));
@@ -111,7 +111,7 @@ contract ProductOwnership is ProductFactory, ERC721 {
         uint256 _tokenId
     )
         external
-        // whenNotPaused
+        whenNotPaused
     {
         // Only an owner can grant transfer approval.
         require(_owns(msg.sender, _tokenId));
@@ -136,7 +136,7 @@ contract ProductOwnership is ProductFactory, ERC721 {
         uint256 _tokenId
     )
         external
-        // whenNotPaused
+        whenNotPaused
     {
         // Safety check to prevent against an unexpected 0x0 default.
         require(_to != address(0));

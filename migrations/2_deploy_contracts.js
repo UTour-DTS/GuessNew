@@ -1,7 +1,7 @@
-var GuessCore = artifacts.require("./GuessCore.sol");
+var GuessBids = artifacts.require("./GuessBids.sol");
 
 module.exports = function(deployer) {
   
-  deployer.deploy(GuessCore);
+  deployer.deploy(GuessBids);
   
 };

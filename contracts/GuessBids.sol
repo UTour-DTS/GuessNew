@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 import "./ProductOwnership.sol";
-import "./SaleClockAuction.sol";
+// import "./SaleClockAuction.sol";
 import "./ERC20.sol";
 import "./GuessEvents.sol";
 import "./GuessDatasets.sol";
@@ -86,6 +86,20 @@ contract GuessBids is ProductOwnership, GuessEvents {
 // DIVIDE
 //****************
     GuessDatasets.Divide private divide_; 
+    
+    constructor () public {
+        // Starts paused.
+        // paused = true;
+
+        // the creator of the contract is the initial CEO
+        ceoAddress = msg.sender;
+
+        // the creator of the contract is also the initial COO
+        cooAddress = msg.sender;
+
+        // start with the mythical kitten 0 - so we don"t have generation-0 parent issues
+        // _createProduct(0, 0, 0, uint256(-1), address(0));
+    }
 
 //==============================================================================
 // these are safety checks
@@ -135,54 +149,54 @@ contract GuessBids is ProductOwnership, GuessEvents {
     // `saleAuction` refers to the auction for gen0 and p2p sale of products.
     // `guessBid` refers to the auction for guess price of products.
 
-    /// @dev Sets the reference to the sale auction.
-    /// @param _address - Address of sale contract.
-    function setSaleAuctionAddress(address _address) external onlyCEO {
-        SaleClockAuction candidateContract = SaleClockAuction(_address);
+    // /// @dev Sets the reference to the sale auction.
+    // /// @param _address - Address of sale contract.
+    // function setSaleAuctionAddress(address _address) external onlyCEO {
+    //     SaleClockAuction candidateContract = SaleClockAuction(_address);
 
-        // NOTE: verify that a contract is what we expect
-        require(candidateContract.isSaleClockAuction());
+    //     // NOTE: verify that a contract is what we expect
+    //     require(candidateContract.isSaleClockAuction());
 
-        // Set the new contract address
-        saleAuction = candidateContract;
-    }
+    //     // Set the new contract address
+    //     saleAuction = candidateContract;
+    // }
 
-    /// @dev Put a product up for auction.
-    ///  Does some ownership trickery to create auctions in one tx.
-    function createSaleAuction(
-        uint256 _productID,
-        uint256 _startingPrice,
-        uint256 _endingPrice,
-        uint256 _duration
-    )
-        external
-        // whenNotPaused
-    {
-        // Auction contract checks input sizes
-        // If product is already on any auction, this will throw
-        // because it will be owned by the auction contract.
-        require(_owns(msg.sender, _productID));
-        // Ensure the product is not pregnant to prevent the auction
-        // contract accidentally receiving ownership of the child.
-        // NOTE: the kitty IS allowed to be in a cooldown.
-        _approve(_productID, address(saleAuction));
-        // Sale auction throws if inputs are invalid and clears
-        // transfer and sire approval after escrowing the kitty.
-        saleAuction.createAuction(
-            _productID,
-            _startingPrice,
-            _endingPrice,
-            _duration,
-            msg.sender
-        );
-    }
+    // /// @dev Put a product up for auction.
+    // ///  Does some ownership trickery to create auctions in one tx.
+    // function createSaleAuction(
+    //     uint256 _productID,
+    //     uint256 _startingPrice,
+    //     uint256 _endingPrice,
+    //     uint256 _duration
+    // )
+    //     external
+    //     // whenNotPaused
+    // {
+    //     // Auction contract checks input sizes
+    //     // If product is already on any auction, this will throw
+    //     // because it will be owned by the auction contract.
+    //     require(_owns(msg.sender, _productID));
+    //     // Ensure the product is not pregnant to prevent the auction
+    //     // contract accidentally receiving ownership of the child.
+    //     // NOTE: the kitty IS allowed to be in a cooldown.
+    //     _approve(_productID, address(saleAuction));
+    //     // Sale auction throws if inputs are invalid and clears
+    //     // transfer and sire approval after escrowing the kitty.
+    //     saleAuction.createAuction(
+    //         _productID,
+    //         _startingPrice,
+    //         _endingPrice,
+    //         _duration,
+    //         msg.sender
+    //     );
+    // }
 
-    /// @dev Transfers the balance of the sale auction contract
-    /// to the KittyCore contract. We use two-step withdrawal to
-    /// prevent two transfer calls in the auction bid function.
-    function withdrawAuctionBalances() external onlyCLevel {
-        saleAuction.withdrawBalance();
-    }
+    // /// @dev Transfers the balance of the sale auction contract
+    // /// to the KittyCore contract. We use two-step withdrawal to
+    // /// prevent two transfer calls in the auction bid function.
+    // function withdrawAuctionBalances() external onlyCLevel {
+    //     saleAuction.withdrawBalance();
+    // }
 
     // @dev set player divide
     function setDivide(uint256 _fnd, uint256 _aff, uint256 _airdrop) external onlyCEO {
@@ -192,60 +206,44 @@ contract GuessBids is ProductOwnership, GuessEvents {
 //==============================================================================
 // use these to interact with contract
 //====|=========================================================================
-    /** @dev create r
+    /** @dev create round
      */
-    // function createRound(
-    //     string _name, 
-    //     string _nameEn, 
-    //     string _disc, 
-    //     string _discEn, 
-    //     uint256 _price,
-    //     uint256 _percent,
-    //     uint256 _maxPlayer,
-    //     uint256 _lastStartTime
-    // ) external only returns (uint256 roundID) { 
-    //     uint256 pid = _createProduct(_name, _nameEn, _disc, _discEn, _price, msg.sender);  
-    //     // _createProduct(_name, _nameEn, _disc, _discEn, _price, msg.sender); 
-    //     uint256 rid = _createRound(pid, _percent, _maxPlayer, _lastStartTime); 
-    //     return rID_;   
-    // }
+    function createRound (
+        string _name, 
+        string _nameEn, 
+        string _disc, 
+        string _discEn, 
+        uint256 _price,
+        uint256 _percent,
+        uint256 _maxPlayer,
+        uint256 _lastStartTime
+    ) public returns (uint256 roundID) { 
+        uint256 pid = _createProduct(_name, _nameEn, _disc, _discEn, _price, msg.sender);
+        // uint256 pid = 0;  
+        uint256 rid = _createRound(pid, _percent, _maxPlayer, _lastStartTime); 
+        return rid;   
+    }
 
-    // function _createRound (
-    //     uint256 _pid,       
-    //     uint256 _percent,
-    //     uint256 _maxPlayer,
-    //     uint256 _lastStartTime
-    // ) 
-    //     internal
-    //     returns(uint256 rid) 
-    // {
-    //     GuessDatasets.Round memory _round = GuessDatasets.Round({
-    //         plyrCount: 0,
-    //         plyrMaxCount: _maxPlayer,
-    //         prdctID: _pid,
-    //         percent: _percent,
+    function _createRound (
+        uint256 _pid,       
+        uint256 _percent,
+        uint256 _maxPlayer,
+        uint256 _lastStartTime
+    ) 
+        internal 
+        returns(uint256 rid)
+    {
+        rID_++;
 
-    //         airdrop: 0, 
-    //         eth: 0, 
-    //         pot: 0, 
+        round_[rID_].plyrMaxCount = _maxPlayer;
+        round_[rID_].prdctID = _pid;
+        round_[rID_].percent = _percent;
+        round_[rID_].strt = _lastStartTime;
 
-    //         strt: _lastStartTime,
-    //         end: 0,
+        // emit GuessEvents.OnNewRound(rID_);
 
-    //         price: 0,
-    //         winPrice: 0, 
-    //         plyr: 0,  
-    //         team: 0,
-    //         ended: false
-    //     });
-
-    //     rID_++;
-    //     round_[rID_] = _round;
-
-    //     emit GuessEvents.OnNewRound(rID_);
-
-    //     return rID_;
-    // }
+        return rID_;
+    }
     
     /**
      * @dev converts all incoming ethereum to keys.
