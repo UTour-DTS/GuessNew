@@ -6,6 +6,7 @@ import "./ERC20.sol";
 import "./GuessEvents.sol";
 import "./GuessDatasets.sol";
 import "./SafeMath.sol";
+import "./ProductFactory.sol";
 
 
 /// @title Handles creating auctions for sale and bid of Product.
@@ -38,6 +39,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
 // data used to store game info that changes
 //=============================|=============================================
     uint256 public rID_;    // round id number / total rounds that have happened
+    uint256 public rID_limit = 50; //rid returns pagesize
     uint256 public pID_;    // last player number;
 //****************
 // PLAYER DATA 
@@ -764,5 +766,53 @@ contract GuessCore is ProductOwnership, GuessEvents {
         
         // lets start first round
         rID_ = 1;
+    }
+    /**
+    use round's rid get round detail and product detail
+     */
+    function getRoundProductDetail(uint256 _rid) public view 
+    returns(uint256 _plyrCount,uint256 _plyrMaxCount,uint256 _prdctID,uint256 _price,uint256 _plyr, bool _ended,  string _name, 
+        string _disc, uint256 _referencePrice)
+    {
+        require(_rid >= 0,"_rid must be greater than equal to or equal to 0!");
+        GuessDatasets.Round storage  round = round_[_rid];
+        uint256 pid = round.prdctID;
+        ProductFactory.Product storage product = ProductFactory.products[pid];
+        return (round.plyrCount,round.plyrMaxCount,round.prdctID,round.price,round.plyr,round.ended,product.name,product.disc,product.price);
+    }
+
+    function getPlayerByAddress(address _walletAddress,uint256 _rid) public view 
+    returns(uint256 _plyrID,uint256 _uto,uint256 _price,uint256 _timestamp,bool _iswin)
+    {
+        require(_walletAddress != address(0),"_walletAddress must be not empty");
+        require(_rid >= 0,"_rid must be greater than equal to or equal to 0!");
+        uint256 plyid = pIDxAddr_[_walletAddress];
+        GuessDatasets.PlayerRounds storage plyrounds = plyrRnds_[plyid][_rid];
+        return (plyrounds.plyrID,plyrounds.uto,plyrounds.price,plyrounds.timestamp,plyrounds.iswin);
+    }
+
+    function getActiveRounds() public  view
+    returns (uint256[] memory  _rids)
+    {
+        uint256[] memory  ridArr;
+        if(rID_ > rID_limit)
+        {
+            uint256 rid_count = rID_.sub(rID_limit);
+            ridArr = new uint256[](rid_count);
+            for (uint256 i = 0; i < rid_count; i++)
+            {
+                ridArr[i] = rid_count.add(i);
+            }
+         
+        }
+        else
+        {
+            ridArr = new uint256[](rID_);
+            for (uint256 j = 0; j < rID_; j++)
+            {
+                ridArr[i] = j;
+            }
+        }
+        return ridArr;
     }
 }

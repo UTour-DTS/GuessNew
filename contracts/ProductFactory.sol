@@ -103,7 +103,7 @@ contract ProductFactory is GuessAccessControl {
         returns (uint256)
     {
         // required _owner must be merchant.
-        require(merchants[msg.sender] != 0);
+        //require(merchants[msg.sender] != 0);
 
         Product memory _product = Product({
             name: _name,
