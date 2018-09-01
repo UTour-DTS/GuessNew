@@ -15,8 +15,6 @@ contract ProductOwnership is ProductFactory, ERC721 {
         bytes4(keccak256("supportsInterface(bytes4)"));
 
     bytes4 constant InterfaceSignature_ERC721 =
-        bytes4(keccak256("name()")) ^
-        bytes4(keccak256("symbol()")) ^
         bytes4(keccak256("totalSupply()")) ^
         bytes4(keccak256("balanceOf(address)")) ^
         bytes4(keccak256("ownerOf(uint256)")) ^

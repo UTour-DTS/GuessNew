@@ -94,7 +94,7 @@ contract GuessAccessControl {
     /// @dev Add new merchat
     function addMerchant(address _newMCH) external onlyCEO {
         require(_newMCH != address(0));
-        require(merchants[_newMCH] != 0);
+        require(merchants[_newMCH] == 0);
 
         merchants[_newMCH] = 1;
     }

@@ -21,9 +21,8 @@ contract ProductFactory is GuessAccessControl {
     /// @dev Transfer event as defined in current draft of ERC721. Emitted every time a product
     ///  ownership is assigned, including create.
     event Transfer(address from, address to, uint256 tokenId);
-
+    
     /*** DATA TYPES ***/
-
     /// @dev The main Product struct. Every product in GUESS is represented by a copy
     ///  of this structure, so great care was taken to ensure that it fits neatly into
     ///  exactly two 256-bit words. Note that the order of the members in this structure
@@ -70,7 +69,6 @@ contract ProductFactory is GuessAccessControl {
     /// @dev The address of the ClockAuction contract that handles sales of Product. 
     ///  The Players can sale the Product which they win.
     // SaleClockAuction public saleAuction;
-
     /// @dev Assigns ownership of a specific Product to an address.
     function _transfer(address _from, address _to, uint256 _tokenId) internal {
         // Since the number of products is capped to 2^32 we can"t overflow this
@@ -101,7 +99,7 @@ contract ProductFactory is GuessAccessControl {
         uint256 _price,
         address _owner
     )
-        public
+        internal
         returns (uint256)
     {
         // required _owner must be merchant.
@@ -117,15 +115,13 @@ contract ProductFactory is GuessAccessControl {
         uint256 newProductId = products.push(_product) - 1;
 
         // emit the CreateProduct event
-        // emit CreateProduct(
-        //     _owner,
-        //     newProductId,
-        //     _name,
-        //     _nameEn,
-        //     _disc,
-        //     _discEn,
-        //     _price
-        // );
+        emit CreateProduct(
+            _owner,
+            newProductId,
+            _name,
+            _disc,
+            _price
+        );
 
         // This will assign ownership, and also emit the Transfer event as
         // per ERC721 draft

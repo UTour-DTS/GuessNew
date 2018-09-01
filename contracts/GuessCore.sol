@@ -751,16 +751,8 @@ contract GuessCore is ProductOwnership, GuessEvents {
     bool public activated_ = false;
     function activate()
         public
+        onlyCLevel
     {
-        // only team just can activate 
-        require(
-            msg.sender == 0x4DdFA34d7398aB561d1aF29f237C59032B9C9C4C ||
-            msg.sender == 0x121D892dCd8239005f67c8eC311B5B6Fe9af75cF ||
-            msg.sender == 0x30884121dcCCf273A0bfd4f68E98b214a900F055 ||
-            msg.sender == 0x33BeFF75b5D98AC8dfcB403f4FAb213F62BdEabA,
-            "only team just can activate"
-        );
-
 		// make sure that its been linked.
         require(address(erc20) != address(0), "must link to other token first");
         
