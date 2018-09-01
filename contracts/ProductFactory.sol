@@ -14,11 +14,9 @@ contract ProductFactory is GuessAccessControl {
         address owner, 
         uint256 productId, 
         string _name, 
-        string _nameEn, 
         string _disc, 
-        string _discEn, 
         uint256 _price
-        );
+    );
 
     /// @dev Transfer event as defined in current draft of ERC721. Emitted every time a product
     ///  ownership is assigned, including create.
@@ -35,14 +33,8 @@ contract ProductFactory is GuessAccessControl {
         // name of product in Chinese.
         string name;
 
-        // name of product in English.
-        string nameEn;
-
         // discription of product in Chinese.
         string disc;
-
-        // discription of product in English.
-        string discEn;
 
         // reference price for the market.
         uint256 price;
@@ -100,16 +92,12 @@ contract ProductFactory is GuessAccessControl {
     ///  input data is known to be valid. Will generate both a CreateProduct event
     ///  and a Transfer event.
     /// @param _name The name of product in Chinese.
-    /// @param _nameEn The name of product in English.
     /// @param _disc The discription of product in Chinese.
-    /// @param _discEn The discription of product in English.
     /// @param _price The reference price of Product for the market.
     /// @param _owner The inital owner of this product, must be non-zero.
     function _createProduct(
         string _name, 
-        string _nameEn, 
         string _disc, 
-        string _discEn, 
         uint256 _price,
         address _owner
     )
@@ -121,9 +109,7 @@ contract ProductFactory is GuessAccessControl {
 
         Product memory _product = Product({
             name: _name,
-            nameEn: _nameEn,
             disc: _disc,
-            discEn: _discEn,
             price: _price,
             createTime: uint64(now)
         });

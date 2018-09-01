@@ -28,7 +28,7 @@ library GuessDatasets {
         uint256 prdctID; // productID
         uint256 percent; // percent to tetants    
 
-        uint256 airdrop;   // airdrop 
+        uint256 holdUto;   // need holding uto 
         uint256 eth;    // total eth
         uint256 pot;    // eth to pot (during round) / final amount paid to players (after round ends)   
 
@@ -36,9 +36,7 @@ library GuessDatasets {
         uint256 end;    // time ends/ended
 
         uint256 price;
-        uint256 winPrice; 
         uint256 plyr;   // pID of player in lead
-        uint256 team;   // tID of team in lead
         bool ended;     // has round end function been ran
     }
 

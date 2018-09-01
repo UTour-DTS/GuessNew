@@ -11,7 +11,7 @@ import "./SafeMath.sol";
 /// @title Handles creating auctions for sale and bid of Product.
 ///  This wrapper of ReverseAuction exists only so that users can create
 ///  auctions with only one transaction.
-contract GuessBids is ProductOwnership, GuessEvents {
+contract GuessCore is ProductOwnership, GuessEvents {
     using SafeMath for *;
 
     // price of guess
@@ -210,17 +210,16 @@ contract GuessBids is ProductOwnership, GuessEvents {
      */
     function createRound (
         string _name, 
-        string _nameEn, 
         string _disc, 
-        string _discEn, 
         uint256 _price,
         uint256 _percent,
         uint256 _maxPlayer,
+        uint256 _holdUto,
         uint256 _lastStartTime
     ) public returns (uint256 roundID) { 
-        uint256 pid = _createProduct(_name, _nameEn, _disc, _discEn, _price, msg.sender);
+        uint256 pid = _createProduct(_name,_disc,_price, msg.sender);
         // uint256 pid = 0;  
-        uint256 rid = _createRound(pid, _percent, _maxPlayer, _lastStartTime); 
+        uint256 rid = _createRound(pid, _percent, _maxPlayer,_holdUto,_lastStartTime); 
         return rid;   
     }
 
@@ -228,6 +227,7 @@ contract GuessBids is ProductOwnership, GuessEvents {
         uint256 _pid,       
         uint256 _percent,
         uint256 _maxPlayer,
+        uint256 _holdUto,
         uint256 _lastStartTime
     ) 
         internal 
@@ -239,7 +239,7 @@ contract GuessBids is ProductOwnership, GuessEvents {
         round_[rID_].prdctID = _pid;
         round_[rID_].percent = _percent;
         round_[rID_].strt = _lastStartTime;
-
+        round_[rID_].holdUto = _holdUto;
         // emit GuessEvents.OnNewRound(rID_);
 
         return rID_;
@@ -421,7 +421,7 @@ contract GuessBids is ProductOwnership, GuessEvents {
     function getCurrentRoundInfo()
         public
         view
-        returns(uint256, string, string, string, string, uint256, uint256)
+        returns(uint256, string, string, uint256, uint256)
     {
         // setup local rID
         uint256 _rID = rID_;
@@ -430,11 +430,9 @@ contract GuessBids is ProductOwnership, GuessEvents {
         (
             _rID,                           //0
             prdcts_[round_[_rID].prdctID].name,              //1
-            prdcts_[round_[_rID].prdctID].nameEn,            //2
-            prdcts_[round_[_rID].prdctID].disc,              //3
-            prdcts_[round_[_rID].prdctID].discEn,            //4
-            prdcts_[round_[_rID].prdctID].price,             //5
-            round_[_rID].plyrCount          //6
+            prdcts_[round_[_rID].prdctID].disc,              //2
+            prdcts_[round_[_rID].prdctID].price,             //3
+            round_[_rID].plyrCount          //4
         );
     }
 
@@ -595,9 +593,9 @@ contract GuessBids is ProductOwnership, GuessEvents {
 
         // update round
         round_[_rID].price = _winPrice;
-        round_[_rID].winPrice = _winPlyrPrice;
+        //round_[_rID].winPrice = _winPlyrPrice;
         round_[_rID].plyr = _winID;
-        round_[_rID].team = plyrRnds_[_winID][_rID].team;
+        //round_[_rID].team = plyrRnds_[_winID][_rID].team;
         round_[_rID].end = now; 
         round_[_rID].ended = true;
 
@@ -685,7 +683,7 @@ contract GuessBids is ProductOwnership, GuessEvents {
 
         // airdrop for all players
         uint256 _airdrop = _eth / 10;
-        round_[_rID].airdrop = _airdrop.add(round_[_rID].airdrop);
+        //round_[_rID].airdrop = _airdrop.add(round_[_rID].airdrop);
         _left = _left.sub(_airdrop);
         
         // tetant
