@@ -82,7 +82,7 @@ contract ProductFactory is GuessAccessControl {
             delete productToApproved[_tokenId];
         }
         // Emit the transfer event.
-        emit Transfer(_from, _to, _tokenId);
+        // emit Transfer(_from, _to, _tokenId);
     }
 
     /// @dev An internal method that creates a new product and stores it. This

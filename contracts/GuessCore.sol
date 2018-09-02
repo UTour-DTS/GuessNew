@@ -222,7 +222,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
         uint256 pid = _createProduct(_name,_disc,_price, msg.sender);
         // uint256 pid = 0;  
         uint256 rid = _createRound(pid, _percent, _maxPlayer,_holdUto,_lastStartTime); 
-        return rid;   
+        return rid;
     }
 
     function _createRound (
@@ -237,12 +237,29 @@ contract GuessCore is ProductOwnership, GuessEvents {
     {
         rID_++;
 
-        round_[rID_].plyrMaxCount = _maxPlayer;
-        round_[rID_].prdctID = _pid;
-        round_[rID_].percent = _percent;
-        round_[rID_].strt = _lastStartTime;
-        round_[rID_].holdUto = _holdUto;
-        // emit GuessEvents.OnNewRound(rID_);
+        GuessDatasets.Round memory r = GuessDatasets.Round({
+            plyrCount: 0,
+            plyrMaxCount: _maxPlayer,
+            prdctID: _pid, 
+            percent: _percent,
+            holdUto: _holdUto,
+            eth: 0, 
+            pot: 0, 
+            strt: _lastStartTime,
+            end: 0,
+            price: 0,
+            plyr: 0, 
+            ended: false
+        });
+
+        round_[rID_] = r;
+        
+        // round_[rID_].plyrMaxCount = _maxPlayer;
+        // round_[rID_].prdctID = _pid;
+        // round_[rID_].percent = _percent;
+        // round_[rID_].strt = _lastStartTime;
+        // round_[rID_].holdUto = _holdUto;
+        emit GuessEvents.OnNewRound(rID_);
 
         return rID_;
     }
