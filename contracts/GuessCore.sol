@@ -98,12 +98,15 @@ contract GuessCore is ProductOwnership, GuessEvents {
 
         // the creator of the contract is also the initial COO
         cooAddress = msg.sender;
+        
+        // the creator of contract is defalut merchants
+        merchants[msg.sender] = 1;
 
         // start with the mythical kitten 0 - so we don"t have generation-0 parent issues
         // _createProduct(0, 0, 0, uint256(-1), address(0));
     }
 
-//==============================================================================
+//============================================merchants[_newMCH] = 1;==================================
 // these are safety checks
 // modifiers
 //==============================================================================
