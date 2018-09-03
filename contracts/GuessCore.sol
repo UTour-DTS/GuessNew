@@ -497,8 +497,8 @@ contract GuessCore is ProductOwnership, GuessEvents {
         private
     {
         require(!round_[_rID].ended);
-        require(round_[_rID].plyrMaxCount > round_[_rID].plyrCount);
-        require(minHolding <= erc20.balanceOf(msg.sender));
+        // require(round_[_rID].plyrMaxCount > round_[_rID].plyrCount);
+        // require(minHolding <= erc20.balanceOf(msg.sender));
         require(plyrRnds_[_pID][_rID].plyrID == 0); 
         
         // grab time
@@ -567,7 +567,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
             pID_++ ;
             // set up player account 
             pIDxAddr_[_addr] = pID_;
-            plyrs_[_pID].addr = _addr;
+            plyrs_[pID_].addr = _addr;
             isNew = true;
         } 
         return (isNew);
