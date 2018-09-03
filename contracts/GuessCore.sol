@@ -835,4 +835,39 @@ contract GuessCore is ProductOwnership, GuessEvents {
         }
         return ridArr;
     }
+    /**
+    set price of guess
+     */
+    function setPriceOfGuess(uint256 _price) external {
+        require(_price>0,"price must be greater than  0! ");
+        rndPrz_ = _price;
+    }
+    /**
+    set min withdraw value
+     */
+    function setMinWithDraw(uint256 _minWithDraw) external {
+        require(_minWithDraw>0,"_minWithDraw must be greater than  0! ");
+        wthdMin_ = _minWithDraw;
+    }
+    /**
+    set max active round count
+     */
+    function setActiveRoundNum(uint256 _activeRoundCount) external {
+        require(_activeRoundCount>0,"_activeRoundCount must be greater than  0! ");
+        rndNum_ = _activeRoundCount;
+    }
+    /**
+    set join guess min holdingToken 
+     */
+    function setMinTokenHold(uint256 _minHoldToken) external {
+        require(_minHoldToken>0,"_minHoldToken must be greater than  0! ");
+        minHolding = _minHoldToken;
+    }
+    /**
+    set Round's max players number
+     */
+    function setRoundMaxPlayers(uint256 _maxPlayers) external {
+        require(_maxPlayers>0,"_maxPlayers must be greater than  0! ");
+        rndMaxNum_ = _maxPlayers;
+    }
 }
