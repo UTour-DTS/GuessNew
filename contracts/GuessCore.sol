@@ -22,7 +22,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
     // amount of round at the same time          
     uint256 private rndNum_ = 1; 
     // min token holding 
-    uint256 private minHolding = 100; 
+    uint256 private minHolding_ = 100; 
     // max amount of players in one round                 
     uint256 private rndMaxNum_ = 200;   
     // max percent of pot for product           
@@ -37,32 +37,27 @@ contract GuessCore is ProductOwnership, GuessEvents {
 
 //==============================================================================
 // data used to store game info that changes
-//=============================|=============================================
-    uint256 public rID_;    // round id number / total rounds that have happened
-    uint256 public rID_limit = 50; //rid returns pagesize
-    uint256 public pID_;    // last player number;
+//=============================|================================================
+    // round id number / total rounds that have happened
+    uint256 public rID_; 
+    //rid returns pagesize
+    uint256 public rID_limit = 50;
+    // last player number;
+    uint256 public pID_;    
 //****************
 // PLAYER DATA 
 //****************
     // (addr => pID) returns player id by address
-    mapping (address => uint256) public pIDxAddr_;  
-    // (name => pID) returns player id by name        
-    mapping (bytes32 => uint256) public pIDxName_; 
-    // (pID => data) player data         
+    mapping (address => uint256) public pIDxAddr_;
+    // (pID => data) player data       
     mapping (uint256 => GuessDatasets.Player) public plyrs_;   
-    mapping (uint256 => mapping (uint256 => GuessDatasets.PlayerRounds)) public plyrRnds_;
     // (pID => rID => data) player round data by player id & round id
-    mapping (uint256 => mapping (bytes32 => bool)) public plyrNames_;
-    // (pID => name => bool) list of names a player owns. 
-    // (used so you can change your display name amongst any name you own)
+    mapping (uint256 => mapping (uint256 => GuessDatasets.PlayerRounds)) public plyrRnds_;  
 //****************
 // ROUND DATA 
 //****************
     // (rID => data) round data
     mapping (uint256 => GuessDatasets.Round) public round_; 
-    mapping (uint256 => mapping(uint256 => uint256)) public rndTmEth_; 
-    // (rID => tID => data) eth in per team, by round id and team id
-    // mapping (uint256 => mapping(uint256 => GuessDatasets.PlayerRounds)) public rndPlyrs_;
     // (rID => pID => data) player data in rounds, by round id and player id
     mapping (uint256 => GuessDatasets.PlayerRounds[]) public rndPlyrs_;
 //****************
@@ -101,12 +96,9 @@ contract GuessCore is ProductOwnership, GuessEvents {
         
         // the creator of contract is defalut merchants
         merchants[msg.sender] = 1;
-
-        // start with the mythical kitten 0 - so we don"t have generation-0 parent issues
-        // _createProduct(0, 0, 0, uint256(-1), address(0));
     }
 
-//============================================merchants[_newMCH] = 1;==================================
+//==============================================================================
 // these are safety checks
 // modifiers
 //==============================================================================
@@ -135,7 +127,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
      * @dev sets boundaries for incoming tx 
      */
     modifier isWithinLimits(uint256 _eth) {
-        require(_eth >= 1000000000, "pocket lint: not a valid currency");
+        require(_eth >= 1000000000000000, "pocket lint: not a valid currency");
         require(_eth <= 100000000000000000000000, "no vitalik, no");
         _;    
     }
@@ -208,6 +200,42 @@ contract GuessCore is ProductOwnership, GuessEvents {
         divide_ = GuessDatasets.Divide(_fnd, _aff, _airdrop);
     }
 
+       /**
+    set price of guess
+     */
+    function setPriceOfGuess(uint256 _price) external onlyCEO {
+        require(_price>0,"price must be greater than  0! ");
+        rndPrz_ = _price;
+    }
+    /**
+    set min withdraw value
+     */
+    function setMinWithDraw(uint256 _minWithDraw) external onlyCEO {
+        require(_minWithDraw>0,"_minWithDraw must be greater than  0! ");
+        wthdMin_ = _minWithDraw;
+    }
+    /**
+    set max active round count
+     */
+    function setActiveRoundNum(uint256 _activeRoundCount) external onlyCEO {
+        require(_activeRoundCount>0,"_activeRoundCount must be greater than  0! ");
+        rndNum_ = _activeRoundCount;
+    }
+    /**
+    set join guess min holdingToken 
+     */
+    function setMinTokenHold(uint256 _minHoldToken) external onlyCEO {
+        require(_minHoldToken>0,"_minHoldToken must be greater than  0! ");
+        minHolding_ = _minHoldToken;
+    }
+    /**
+    set Round's max players number
+     */
+    function setRoundMaxPlayers(uint256 _maxPlayers) external onlyCEO {
+        require(_maxPlayers>0,"_maxPlayers must be greater than  0! ");
+        rndMaxNum_ = _maxPlayers;
+    }
+
 //==============================================================================
 // use these to interact with contract
 //====|=========================================================================
@@ -223,7 +251,6 @@ contract GuessCore is ProductOwnership, GuessEvents {
         uint256 _lastStartTime
     ) public returns (uint256 roundID) { 
         uint256 pid = _createProduct(_name,_disc,_price, msg.sender);
-        // uint256 pid = 0;  
         uint256 rid = _createRound(pid, _percent, _maxPlayer,_holdUto,_lastStartTime); 
         return rid;
     }
@@ -355,7 +382,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
     {   
         require(!round_[_rID].ended);
         require(round_[_rID].plyrMaxCount > round_[_rID].plyrCount);
-        require(minHolding <= erc20.balanceOf(msg.sender));
+        require(minHolding_ <= erc20.balanceOf(msg.sender));
         require(plyrRnds_[_pID][_rID].plyrID == 0); 
         
         // grab time
@@ -500,8 +527,8 @@ contract GuessCore is ProductOwnership, GuessEvents {
         private
     {
         require(!round_[_rID].ended);
-        // require(round_[_rID].plyrMaxCount > round_[_rID].plyrCount);
-        // require(minHolding <= erc20.balanceOf(msg.sender));
+        require(round_[_rID].plyrMaxCount > round_[_rID].plyrCount);
+        require(round_[_rID].holdUto <= erc20.balanceOf(msg.sender));
         require(plyrRnds_[_pID][_rID].plyrID == 0); 
         
         // grab time
@@ -538,7 +565,6 @@ contract GuessCore is ProductOwnership, GuessEvents {
         // update round
         round_[_rID].plyrCount = round_[_rID].plyrCount.add(1);
         round_[_rID].eth = _eth.add(round_[_rID].eth);
-        rndTmEth_[_rID][_team] = _eth.add(rndTmEth_[_rID][_team]);
 
         rndPlyrs_[_rID].push(data);
 
@@ -834,40 +860,5 @@ contract GuessCore is ProductOwnership, GuessEvents {
             }
         }
         return ridArr;
-    }
-    /**
-    set price of guess
-     */
-    function setPriceOfGuess(uint256 _price) external {
-        require(_price>0,"price must be greater than  0! ");
-        rndPrz_ = _price;
-    }
-    /**
-    set min withdraw value
-     */
-    function setMinWithDraw(uint256 _minWithDraw) external {
-        require(_minWithDraw>0,"_minWithDraw must be greater than  0! ");
-        wthdMin_ = _minWithDraw;
-    }
-    /**
-    set max active round count
-     */
-    function setActiveRoundNum(uint256 _activeRoundCount) external {
-        require(_activeRoundCount>0,"_activeRoundCount must be greater than  0! ");
-        rndNum_ = _activeRoundCount;
-    }
-    /**
-    set join guess min holdingToken 
-     */
-    function setMinTokenHold(uint256 _minHoldToken) external {
-        require(_minHoldToken>0,"_minHoldToken must be greater than  0! ");
-        minHolding = _minHoldToken;
-    }
-    /**
-    set Round's max players number
-     */
-    function setRoundMaxPlayers(uint256 _maxPlayers) external {
-        require(_maxPlayers>0,"_maxPlayers must be greater than  0! ");
-        rndMaxNum_ = _maxPlayers;
     }
 }
