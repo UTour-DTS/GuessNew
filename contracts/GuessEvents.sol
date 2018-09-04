@@ -42,6 +42,16 @@ contract GuessEvents {
         // uint256 airDropPot
     );
     
+    // OnEndRound
+    event OnEndRound
+    (
+        uint256 rID,
+        uint256 pID,
+        uint256 winPrice,
+        uint256 endTime,
+        address addr
+    );
+
     // fired whenever theres a withdraw
     event OnWithdraw
     (

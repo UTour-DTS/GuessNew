@@ -630,13 +630,20 @@ contract GuessCore is ProductOwnership, GuessEvents {
 
         // update round
         round_[_rID].price = _winPrice;
-        //round_[_rID].winPrice = _winPlyrPrice;
         round_[_rID].plyr = _winID;
-        //round_[_rID].team = plyrRnds_[_winID][_rID].team;
         round_[_rID].end = now; 
         round_[_rID].ended = true;
 
         // update player
+        plyrRnds_[_rID][_winID].iswin = true;
+
+        //transfer token
+        address _from = productToOwner[round_[_rID].prdctID];
+        address _to = plyrs_[_winID].addr;
+
+        _transfer(_from, _to, round_[_rID].prdctID);
+
+        emit GuessEvents.OnEndRound(_rID, _winID, _winPrice, round_[_rID].end, plyrs_[_winID].addr);
     }
     
     /**
