@@ -199,43 +199,31 @@ contract GuessCore is ProductOwnership, GuessEvents {
     function setDivide(uint256 _fnd, uint256 _aff, uint256 _airdrop) external onlyCEO {
         divide_ = GuessDatasets.Divide(_fnd, _aff, _airdrop);
     }
-
        /**
     set price of guess
      */
     function setPriceOfGuess(uint256 _price) external onlyCEO {
-        // require(_price>0,"price must be greater than  0! ");
         rndPrz_ = _price;
     }
     /**
     set min withdraw value
      */
     function setMinWithDraw(uint256 _minWithDraw) external onlyCEO {
-        // require(_minWithDraw>0,"_minWithDraw must be greater than  0! ");
         wthdMin_ = _minWithDraw;
     }
     /**
     set max active round count
      */
     function setActiveRoundNum(uint256 _activeRoundCount) external onlyCEO {
-        // require(_activeRoundCount>0,"_activeRoundCount must be greater than  0! ");
         rndNum_ = _activeRoundCount;
     }
-    // /**
-    // set join guess min holdingToken 
-    //  */
-    // function setMinTokenHold(uint256 _minHoldToken) external onlyCEO {
-    //     // require(_minHoldToken>0,"_minHoldToken must be greater than  0! ");
-    //     minHolding_ = _minHoldToken;
-    // }
     /**
     set Round's max players number
      */
     function setRoundMaxPlayers(uint256 _maxPlayers) external onlyCEO {
-        // require(_maxPlayers>0,"_maxPlayers must be greater than  0! ");
         rndMaxNum_ = _maxPlayers;
     }
-
+  
 //==============================================================================
 // use these to interact with contract
 //====|=========================================================================
@@ -793,7 +781,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
 //==============================================================================
 //    (~ _  _    _._|_    .
 //    _)(/_(_|_|| | | \/  .
-//====================/=========================================================
+//=============================================================================
     /** upon contract deploy, it will be deactivated.  this is a one time
      * use function that will activate the contract.  we do this so devs 
      * have time to set things up on the web end                            **/
@@ -821,7 +809,6 @@ contract GuessCore is ProductOwnership, GuessEvents {
     returns(uint256 _plyrCount,uint256 _plyrMaxCount,uint256 _prdctID,uint256 _price,uint256 _plyr, bool _ended,  string _name, 
         string _disc, uint256 _referencePrice)
     {
-        require(_rid >= 0,"_rid must be greater than equal to or equal to 0!");
         GuessDatasets.Round storage  round = round_[_rid];
         uint256 pid = round.prdctID;
         ProductFactory.Product storage product = ProductFactory.products[pid];
@@ -832,7 +819,6 @@ contract GuessCore is ProductOwnership, GuessEvents {
     returns(uint256 _plyrID,uint256 _uto,uint256 _price,uint256 _timestamp,bool _iswin)
     {
         require(_walletAddress != address(0),"_walletAddress must be not empty");
-        require(_rid >= 0,"_rid must be greater than equal to or equal to 0!");
         uint256 plyid = pIDxAddr_[_walletAddress];
         GuessDatasets.PlayerRounds storage plyrounds = plyrRnds_[plyid][_rid];
         return (plyrounds.plyrID,plyrounds.uto,plyrounds.price,plyrounds.timestamp,plyrounds.iswin);

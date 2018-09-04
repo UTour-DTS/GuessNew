@@ -19,7 +19,7 @@ contract GuessEvents {
         uint256 team,
         uint256 affID,
         address addr
-    )
+    );
     
     // fired at end of buy or reload
     event OnEndTx
