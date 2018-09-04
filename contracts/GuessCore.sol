@@ -22,7 +22,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
     // amount of round at the same time          
     uint256 private rndNum_ = 1; 
     // min token holding 
-    uint256 private minHolding_ = 100; 
+    // uint256 private minHolding_ = 100; 
     // max amount of players in one round                 
     uint256 private rndMaxNum_ = 200;   
     // max percent of pot for product           
@@ -204,35 +204,35 @@ contract GuessCore is ProductOwnership, GuessEvents {
     set price of guess
      */
     function setPriceOfGuess(uint256 _price) external onlyCEO {
-        require(_price>0,"price must be greater than  0! ");
+        // require(_price>0,"price must be greater than  0! ");
         rndPrz_ = _price;
     }
     /**
     set min withdraw value
      */
     function setMinWithDraw(uint256 _minWithDraw) external onlyCEO {
-        require(_minWithDraw>0,"_minWithDraw must be greater than  0! ");
+        // require(_minWithDraw>0,"_minWithDraw must be greater than  0! ");
         wthdMin_ = _minWithDraw;
     }
     /**
     set max active round count
      */
     function setActiveRoundNum(uint256 _activeRoundCount) external onlyCEO {
-        require(_activeRoundCount>0,"_activeRoundCount must be greater than  0! ");
+        // require(_activeRoundCount>0,"_activeRoundCount must be greater than  0! ");
         rndNum_ = _activeRoundCount;
     }
-    /**
-    set join guess min holdingToken 
-     */
-    function setMinTokenHold(uint256 _minHoldToken) external onlyCEO {
-        require(_minHoldToken>0,"_minHoldToken must be greater than  0! ");
-        minHolding_ = _minHoldToken;
-    }
+    // /**
+    // set join guess min holdingToken 
+    //  */
+    // function setMinTokenHold(uint256 _minHoldToken) external onlyCEO {
+    //     // require(_minHoldToken>0,"_minHoldToken must be greater than  0! ");
+    //     minHolding_ = _minHoldToken;
+    // }
     /**
     set Round's max players number
      */
     function setRoundMaxPlayers(uint256 _maxPlayers) external onlyCEO {
-        require(_maxPlayers>0,"_maxPlayers must be greater than  0! ");
+        // require(_maxPlayers>0,"_maxPlayers must be greater than  0! ");
         rndMaxNum_ = _maxPlayers;
     }
 
@@ -331,8 +331,9 @@ contract GuessCore is ProductOwnership, GuessEvents {
         
         // buy core 
         buyCore(_rID, _price, _affCode, _pID, _team);
+
+        emit GuessEvents.OnGuess(_rID, _pID, _price, _team, _affCode, msg.sender);
     }
-    
     
     /**
      * @dev essentially the same as buy, but instead of you sending ether 
@@ -382,7 +383,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
     {   
         require(!round_[_rID].ended);
         require(round_[_rID].plyrMaxCount > round_[_rID].plyrCount);
-        require(minHolding_ <= erc20.balanceOf(msg.sender));
+        require(round_[_rID].holdUto  <= erc20.balanceOf(msg.sender));
         require(plyrRnds_[_pID][_rID].plyrID == 0); 
         
         // grab time

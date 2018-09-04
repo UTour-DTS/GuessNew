@@ -10,6 +10,16 @@ contract GuessEvents {
     event OnNewRound (
         uint256 rid
     );
+
+    // guess 
+    event OnGuess (
+        uint256 rID,
+        uint256 pID,
+        uint256 price,
+        uint256 team,
+        uint256 affID,
+        address addr
+    )
     
     // fired at end of buy or reload
     event OnEndTx
