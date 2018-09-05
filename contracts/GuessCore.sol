@@ -96,6 +96,9 @@ contract GuessCore is ProductOwnership, GuessEvents {
         
         // the creator of contract is defalut merchants
         merchants[msg.sender] = 1;
+
+        // start with the product 0 
+        _createProduct("", "", 0, address(0));
     }
 
 //==============================================================================
