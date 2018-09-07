@@ -87,7 +87,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
             name: "zero",
             disc: "zero",
             price: 0,
-            createTime: uint64(now)
+            createTime: now
         }));
     }
 
@@ -138,7 +138,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
     }
 
     // @dev set player divide
-    function setDivide(uint256 _fnd, uint256 _aff, uint256 _airdrop) external onlyCEO {
+    function setDivide(uint32 _fnd, uint32 _aff, uint32 _airdrop) external onlyCEO {
         divide_ = GuessDatasets.Divide(_fnd, _aff, _airdrop);
     }
        /**
@@ -231,9 +231,8 @@ contract GuessCore is ProductOwnership, GuessEvents {
      * @dev converts all incoming ethereum to keys.
      * @param _price price of player guess
      * @param _affCode the ID of the player who gets the affiliate fee
-     * @param _team what team is the player playing for?
      */
-    function guess(uint256 _rID, uint256 _price, uint256 _affCode, uint256 _team)
+    function guess(uint256 _rID, uint256 _price, uint256 _affCode)
         isActivated()
         isHuman()
         isWithinLimits(msg.value)
@@ -259,13 +258,10 @@ contract GuessCore is ProductOwnership, GuessEvents {
             plyrs_[_pID].laff = _affCode;
         }
         
-        // verify a valid team was selected
-        _team = verifyTeam(_team);
-        
         // buy core 
-        buyCore(_rID, _price, _affCode, _pID, _team);
+        buyCore(_rID, _price, _affCode, _pID);
 
-        emit GuessEvents.OnGuess(_rID, _pID, _price, _team, _affCode, msg.sender);
+        emit GuessEvents.OnGuess(_rID, _pID, _price, _affCode, msg.sender);
     }
 
     /**
@@ -324,7 +320,6 @@ contract GuessCore is ProductOwnership, GuessEvents {
      * @return time round ends
      * @return time round started
      * @return current pot 
-     * @return current team ID & player ID in lead 
      * @return current player in leads address 
      * @return current player in leads name
      * @return whales eth in for round
@@ -390,7 +385,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
      * @dev logic runs whenever a buy order is executed.  determines how to handle 
      * incoming eth depending on if we are in an active round or not
      */
-    function buyCore(uint _rID, uint256 _price, uint256 _affID, uint256 _pID, uint256 _team)
+    function buyCore(uint _rID, uint256 _price, uint256 _affID, uint256 _pID)
         private
     {
         require(!round_[_rID].ended, "this round is over, join next round");
@@ -403,7 +398,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
         require(_now > round_[_rID].strt, "not start, please wait");
 
         // call core 
-        core(_rID, _pID, _price, msg.value, _affID, _team);
+        core(_rID, _pID, _price, msg.value, _affID);
 
         // if round is over
         if (round_[_rID].plyrMaxCount ==  round_[_rID].plyrCount) 
@@ -416,16 +411,15 @@ contract GuessCore is ProductOwnership, GuessEvents {
      * @dev this is the core logic for any buy/reload that happens while a round 
      * is live.
      */
-    function core(uint256 _rID, uint256 _pID, uint256 _price, uint256 _eth, uint256 _affID, uint256 _team)
+    function core(uint256 _rID, uint256 _pID, uint256 _price, uint256 _eth, uint256 _affID)
         private
     {
         GuessDatasets.PlayerRounds memory data = GuessDatasets.PlayerRounds(
-            _pID, getTokenBalance(msg.sender), _price, now, _team, false);
+            _pID, getTokenBalance(msg.sender), _price, now, false);
         // update player round
         plyrRnds_[_pID][_rID].uto =  getTokenBalance(msg.sender);
         plyrRnds_[_pID][_rID].price = _price;
         plyrRnds_[_pID][_rID].timestamp = now;
-        plyrRnds_[_pID][_rID].team = _team;
         plyrRnds_[_pID][_rID].iswin = false;
         
         // update round
@@ -445,7 +439,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
 
 
         // call end tx function to fire end tx event.
-        endTx(_pID, _team, _eth);
+        endTx(_pID, _eth);
     }
 //==============================================================================
 // tools
@@ -471,21 +465,6 @@ contract GuessCore is ProductOwnership, GuessEvents {
             isNew = true;
         } 
         return (isNew);
-    }
-    
-    /**
-     * @dev checks to make sure user picked a valid team.  if not sets team 
-     * to default (sneks)
-     */
-    function verifyTeam(uint256 _team)
-        private
-        pure
-        returns (uint256)
-    {
-        if (_team < 0 || _team > 3)
-            return(0);
-        else
-            return(_team);
     }
     
     /**
@@ -517,7 +496,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
         // update round
         round_[_rID].price = _winPrice;
         round_[_rID].plyr = _winID;
-        round_[_rID].end = now; 
+        round_[_rID].end = uint64(now); 
         round_[_rID].ended = true;
 
         // update player
@@ -671,14 +650,13 @@ contract GuessCore is ProductOwnership, GuessEvents {
     /**
      * @dev prepares compression data and fires event for buy or reload tx"s
      */
-    function endTx(uint256 _pID, uint256 _team, uint256 _eth)
+    function endTx(uint256 _pID, uint256 _eth)
         private
     {
         emit GuessEvents.OnEndTx
         (
             msg.sender,
             _pID,
-            _team,
             _eth
         );
     }

@@ -5,7 +5,6 @@ library GuessDatasets {
 
     struct Player {
         address addr;   // player address
-        bytes32 name;   // player name
         uint256 airdrop;    // airdrop vault
         uint256 gen;    // general vault
         uint256 aff;    // affiliate vault
@@ -19,7 +18,6 @@ library GuessDatasets {
         uint256 uto;    // holding uto when guess
         uint256 price;  // guess price
         uint256 timestamp; // guess timestamp
-        uint256 team;     // team id
         bool iswin;     // player is winner or not
     }
 
@@ -42,8 +40,8 @@ library GuessDatasets {
     }
 
     struct Divide {
-        uint256 fnd;    // % of guess thats paid to found 
-        uint256 aff;    // % of guess thats paid to affiliate
-        uint256 airdrop;// % of guess thats paid to airdrop
+        uint32 fnd;    // % of guess thats paid to found 
+        uint32 aff;    // % of guess thats paid to affiliate
+        uint32 airdrop;// % of guess thats paid to airdrop
     }
 }

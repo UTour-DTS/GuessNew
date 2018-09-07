@@ -16,7 +16,6 @@ contract GuessEvents {
         uint256 rID,
         uint256 pID,
         uint256 price,
-        uint256 team,
         uint256 affID,
         address addr
     );
@@ -26,7 +25,6 @@ contract GuessEvents {
     (
         address playerAddress,
         uint256 playerID,
-        uint256 teamID,
         uint256 ethIn
     );
     

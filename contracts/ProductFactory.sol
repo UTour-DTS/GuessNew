@@ -38,7 +38,7 @@ contract ProductFactory is GuessAccessControl {
         uint256 price;
 
         // The timestamp from the block when this cat came into existence.
-        uint64 createTime;
+        uint256 createTime;
     }
 
     /*** CONSTANTS ***/
@@ -105,7 +105,7 @@ contract ProductFactory is GuessAccessControl {
             name: _name,
             disc: _disc,
             price: _price,
-            createTime: uint64(now)
+            createTime: now
         });
 
         uint256 newProductId = products.push(_product) - 1;
