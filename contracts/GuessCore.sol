@@ -1,7 +1,6 @@
 pragma solidity ^0.4.24;
 
 import "./ProductOwnership.sol";
-// import "./SaleClockAuction.sol";
 import "./ERC20.sol";
 import "./GuessEvents.sol";
 import "./GuessDatasets.sol";
@@ -9,9 +8,7 @@ import "./SafeMath.sol";
 import "./ProductFactory.sol";
 
 
-/// @title Handles creating auctions for sale and bid of Product.
-///  This wrapper of ReverseAuction exists only so that users can create
-///  auctions with only one transaction.
+/// @title logic core
 contract GuessCore is ProductOwnership, GuessEvents {
     using SafeMath for *;
 
@@ -66,14 +63,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
 //****************
     // (address => valaut) valaut of tetants sell product
     mapping(address => uint256) public tetants_; 
-
-//****************
-// TEAM FEE DATA 
-//****************
-    // (team => fees) fee distribution by team
-    mapping (uint256 => GuessDatasets.TeamFee) public fees_;  
-    // (team => fees) pot split distribution by team        
-    mapping (uint256 => GuessDatasets.PotSplit) public potSplit_;     
+ 
 //****************
 // DIVIDE
 //****************
@@ -137,7 +127,6 @@ contract GuessCore is ProductOwnership, GuessEvents {
 
 //==============================================================================
 // use these to sell product
-// saleauction
 //==============================================================================
     // @dev set erc20 token contract by address.
     function setERC20(address _address) external onlyCEO {
@@ -147,60 +136,6 @@ contract GuessCore is ProductOwnership, GuessEvents {
     function getTokenBalance(address _address) view public returns (uint256){
         return erc20.balanceOf(_address);
     }
-
-    // @notice The auction contract variables are defined in ProductFactory to allow
-    //  us to refer to them in ProductOwnership to prevent accidental transfers.
-    // `saleAuction` refers to the auction for gen0 and p2p sale of products.
-    // `guessBid` refers to the auction for guess price of products.
-
-    // /// @dev Sets the reference to the sale auction.
-    // /// @param _address - Address of sale contract.
-    // function setSaleAuctionAddress(address _address) external onlyCEO {
-    //     SaleClockAuction candidateContract = SaleClockAuction(_address);
-
-    //     // NOTE: verify that a contract is what we expect
-    //     require(candidateContract.isSaleClockAuction());
-
-    //     // Set the new contract address
-    //     saleAuction = candidateContract;
-    // }
-
-    // /// @dev Put a product up for auction.
-    // ///  Does some ownership trickery to create auctions in one tx.
-    // function createSaleAuction(
-    //     uint256 _productID,
-    //     uint256 _startingPrice,
-    //     uint256 _endingPrice,
-    //     uint256 _duration
-    // )
-    //     external
-    //     // whenNotPaused
-    // {
-    //     // Auction contract checks input sizes
-    //     // If product is already on any auction, this will throw
-    //     // because it will be owned by the auction contract.
-    //     require(_owns(msg.sender, _productID));
-    //     // Ensure the product is not pregnant to prevent the auction
-    //     // contract accidentally receiving ownership of the child.
-    //     // NOTE: the kitty IS allowed to be in a cooldown.
-    //     _approve(_productID, address(saleAuction));
-    //     // Sale auction throws if inputs are invalid and clears
-    //     // transfer and sire approval after escrowing the kitty.
-    //     saleAuction.createAuction(
-    //         _productID,
-    //         _startingPrice,
-    //         _endingPrice,
-    //         _duration,
-    //         msg.sender
-    //     );
-    // }
-
-    // /// @dev Transfers the balance of the sale auction contract
-    // /// to the KittyCore contract. We use two-step withdrawal to
-    // /// prevent two transfer calls in the auction bid function.
-    // function withdrawAuctionBalances() external onlyCLevel {
-    //     saleAuction.withdrawBalance();
-    // }
 
     // @dev set player divide
     function setDivide(uint256 _fnd, uint256 _aff, uint256 _airdrop) external onlyCEO {
@@ -331,74 +266,6 @@ contract GuessCore is ProductOwnership, GuessEvents {
         buyCore(_rID, _price, _affCode, _pID, _team);
 
         emit GuessEvents.OnGuess(_rID, _pID, _price, _team, _affCode, msg.sender);
-    }
-    
-    /**
-     * @dev essentially the same as buy, but instead of you sending ether 
-     * from your wallet, it uses your unwithdrawn earnings.
-     * -functionhash- 0x349cdcac (using ID for affiliate)
-     * -functionhash- 0x82bfc739 (using address for affiliate)
-     * -functionhash- 0x079ce327 (using name for affiliate)
-     * @param _affCode the ID/address/name of the player who gets the affiliate fee
-     * @param _team what team is the player playing for?
-     * @param _eth amount of earnings to use (remainder returned to gen vault)
-     */
-    function reLoadXid(uint256 _rID, uint256 _price, uint256 _affCode, uint256 _team, uint256 _eth)
-        isActivated()
-        isHuman()
-        isWithinLimits(_eth)
-        public
-    {   
-        // fetch player ID
-        uint256 _pID = pIDxAddr_[msg.sender];
-        
-        // manage affiliate residuals
-        // if no affiliate code was given or player tried to use their own, lolz
-        if (_affCode == 0 || _affCode == _pID)
-        {
-            // use last stored affiliate code 
-            _affCode = plyrs_[_pID].laff;
-            
-        // if affiliate code was given & its not the same as previously stored 
-        } else if (_affCode != plyrs_[_pID].laff) {
-            // update last affiliate 
-            plyrs_[_pID].laff = _affCode;
-        }
-
-        // verify a valid team was selected
-        _team = verifyTeam(_team);
-
-        // reload core
-        reLoadCore(_rID, _pID, _price, _affCode, _team, _eth);
-    }
-
-    /**
-     * @dev logic runs whenever a reload order is executed.  determines how to handle 
-     * incoming eth depending on if we are in an active round or not 
-     */
-    function reLoadCore(uint256 _rID, uint256 _pID, uint256 _price, uint256 _affID, uint256 _team, uint256 _eth)
-        private
-    {   
-        require(!round_[_rID].ended, "round is over, join next round");
-        require(round_[_rID].plyrMaxCount > round_[_rID].plyrCount, "more players, join next round");
-        require(round_[_rID].holdUto <= getTokenBalance(msg.sender).sub(plyrs_[_pID].lockUto), "not holding enough uto");
-        require(plyrRnds_[_pID][_rID].plyrID == 0, "already joined"); 
-        
-        // grab time
-        uint256 _now = now;
-        require(_now > round_[_rID].strt);
-        
-        // sub eth
-        plyrs_[_pID].gen = withdrawEarnings(_pID).sub(_eth);
-
-        // call core 
-        core(_rID, _pID, _price, msg.value, _affID, _team);
-
-        // if round is over
-        if (round_[_rID].plyrMaxCount ==  round_[_rID].plyrCount) 
-        {
-            endRound(_rID);
-        }
     }
 
     /**
@@ -560,7 +427,6 @@ contract GuessCore is ProductOwnership, GuessEvents {
         plyrRnds_[_pID][_rID].timestamp = now;
         plyrRnds_[_pID][_rID].team = _team;
         plyrRnds_[_pID][_rID].iswin = false;
-        // plyrRnds_[_pID][_rID] = data;
         
         // update round
         round_[_rID].plyrCount = round_[_rID].plyrCount.add(1);

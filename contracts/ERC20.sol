@@ -1,6 +1,8 @@
 pragma solidity ^0.4.24;
 
 
+/// @title ERC20 token for UTOToken
+/// contract address: 0x1a8f615F0dD39B9DE8ad26db89Cfa76F7c9D0274 
 contract ERC20{
     uint256 public totalSupply;
     

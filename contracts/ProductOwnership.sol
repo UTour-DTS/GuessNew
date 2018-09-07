@@ -1,6 +1,5 @@
 pragma solidity ^0.4.24;
 
-// import "openzeppelin-solidity/contracts/token/ERC721/ERC721.sol";
 import "./ProductFactory.sol";
 import "./ERC721.sol";
 
@@ -86,10 +85,6 @@ contract ProductOwnership is ProductFactory, ERC721 {
         // Disallow transfers to this contract to prevent accidental misuse.
         // The contract should never own any products.
         require(_to != address(this));
-        // Disallow transfers to the auction contracts. 
-        // Auction contracts should only take ownership of products
-        // through the allow + transferFrom flow.
-        // require(_to != address(saleAuction));
 
         // You can only send your own cat.
         require(_owns(msg.sender, _tokenId));

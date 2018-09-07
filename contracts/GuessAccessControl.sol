@@ -10,7 +10,7 @@ contract GuessAccessControl {
     //         contracts. It is initially set to the address that created the smart contract 
     //         in the GuessCore constructor. The CEO can add new Merchants。
     // 
-    //     - The CFO: The CFO can withdraw funds from GuessCore and its auction contracts.
+    //     - The CFO: The CFO can withdraw funds from GuessCore.
     //
     //     - The COO: The COO can manual start and end the game.
     //

@@ -1,7 +1,6 @@
 pragma solidity ^0.4.24;
 
 import "./GuessAccessControl.sol";
-// import "./SaleClockAuction.sol";
 
 
 /// @title Base contract for Guess. Holds all common structs, events and base variables.
@@ -66,9 +65,6 @@ contract ProductFactory is GuessAccessControl {
     ///  at any time. A zero value means no approval is outstanding.
     mapping (uint256 => address) public productToApproved;
 
-    /// @dev The address of the ClockAuction contract that handles sales of Product. 
-    ///  The Players can sale the Product which they win.
-    // SaleClockAuction public saleAuction;
     /// @dev Assigns ownership of a specific Product to an address.
     function _transfer(address _from, address _to, uint256 _tokenId) internal {
         // Since the number of products is capped to 2^32 we can"t overflow this

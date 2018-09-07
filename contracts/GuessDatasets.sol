@@ -11,7 +11,7 @@ library GuessDatasets {
         uint256 aff;    // affiliate vault
         uint256 lrnd;   // last round played
         uint256 laff;   // last affiliate id used
-        uint256 uto; // locked uto
+        uint256 lockUto; // locked uto
     }
 
     struct PlayerRounds {
@@ -40,17 +40,6 @@ library GuessDatasets {
         uint256 plyr;   // pID of player in lead
         bool ended;     // has round end function been ran
     }
-
-    struct TeamFee {
-        uint256 gen;    // % of buy in thats paid to key holders of current round
-        uint256 uto;    // % of buy in thats paid to p3d holders
-    }
-
-    struct PotSplit {
-        uint256 gen;    // % of pot thats paid to players of current round
-        uint256 uto;    // % of pot thats paid to uto holders of current round
-        uint256 lott;   // % of pot thats paid to airdrop of current round
-    } 
 
     struct Divide {
         uint256 fnd;    // % of guess thats paid to found 
