@@ -63,7 +63,7 @@ contract GuessAccessControl {
     }
 
     modifier onlyMCH() {
-        require(merchants[msg.sender] != 0);
+        require(merchants[msg.sender] != 0, "not member of merchants");
         _; 
     }
 

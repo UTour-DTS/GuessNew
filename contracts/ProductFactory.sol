@@ -96,11 +96,9 @@ contract ProductFactory is GuessAccessControl {
         address _owner
     )
         internal
+        onlyMCH
         returns (uint256)
     {
-        // required _owner must be merchant.
-        //require(merchants[msg.sender] != 0);
-
         Product memory _product = Product({
             name: _name,
             disc: _disc,

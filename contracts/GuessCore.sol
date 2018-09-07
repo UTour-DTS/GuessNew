@@ -179,7 +179,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
         uint256 _maxPlayer,
         uint256 _holdUto,
         uint256 _lastStartTime
-    ) public returns (uint256 roundID) { 
+    ) public onlyMCH returns (uint256 roundID) { 
 
         require(_maxPlayer >= 2, "must more than 2 players!");
 
@@ -380,7 +380,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
 
 //==============================================================================
 // this + tools + calcs + modules = our softwares engine
-//=====================_|=======================================================
+//==============================================================================
     /**
      * @dev logic runs whenever a buy order is executed.  determines how to handle 
      * incoming eth depending on if we are in an active round or not
@@ -496,7 +496,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
         // update round
         round_[_rID].price = _winPrice;
         round_[_rID].plyr = _winID;
-        round_[_rID].end = uint64(now); 
+        round_[_rID].end = now; 
         round_[_rID].ended = true;
 
         // update player
