@@ -379,10 +379,10 @@ contract GuessCore is ProductOwnership, GuessEvents {
     function reLoadCore(uint256 _rID, uint256 _pID, uint256 _price, uint256 _affID, uint256 _team, uint256 _eth)
         private
     {   
-        require(!round_[_rID].ended);
-        require(round_[_rID].plyrMaxCount > round_[_rID].plyrCount);
-        require(round_[_rID].holdUto  <= getTokenBalance(msg.sender));
-        require(plyrRnds_[_pID][_rID].plyrID == 0); 
+        require(!round_[_rID].ended, "round is over, join next round");
+        require(round_[_rID].plyrMaxCount > round_[_rID].plyrCount, "more players, join next round");
+        require(round_[_rID].holdUto <= getTokenBalance(msg.sender).sub(plyrs_[_pID].lockUto), "not holding enough uto");
+        require(plyrRnds_[_pID][_rID].plyrID == 0, "already joined"); 
         
         // grab time
         uint256 _now = now;
@@ -418,7 +418,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
         // get their earnings
         uint256 _eth = withdrawEarnings(_pID);
 
-        require(_eth > wthdMin_);
+        require(_eth > wthdMin_, "valaut must more than min withdraw");
             
         // gib moni
         if (_eth > 0)
@@ -528,12 +528,12 @@ contract GuessCore is ProductOwnership, GuessEvents {
     {
         require(!round_[_rID].ended, "this round is over, join next round");
         require(round_[_rID].plyrMaxCount > round_[_rID].plyrCount, "more players, join next round");
-        require(round_[_rID].holdUto <= getTokenBalance(msg.sender));
+        require(round_[_rID].holdUto <= getTokenBalance(msg.sender).sub(plyrs_[_pID].lockUto), "not holding enough uto");
         require(plyrRnds_[_pID][_rID].plyrID == 0, "already joined");  
         
         // grab time
         uint256 _now = now;
-        require(_now > round_[_rID].strt);
+        require(_now > round_[_rID].strt, "not start, please wait");
 
         // call core 
         core(_rID, _pID, _price, msg.value, _affID, _team);
@@ -555,7 +555,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
         GuessDatasets.PlayerRounds memory data = GuessDatasets.PlayerRounds(
             _pID, getTokenBalance(msg.sender), _price, now, _team, false);
         // update player round
-        plyrRnds_[_pID][_rID].uto = getTokenBalance(msg.sender);
+        plyrRnds_[_pID][_rID].uto =  getTokenBalance(msg.sender);
         plyrRnds_[_pID][_rID].price = _price;
         plyrRnds_[_pID][_rID].timestamp = now;
         plyrRnds_[_pID][_rID].team = _team;
@@ -575,6 +575,8 @@ contract GuessCore is ProductOwnership, GuessEvents {
 
         // update player
         plyrs_[_pID].lrnd = _rID;
+        plyrs_[_pID].lockUto = plyrs_[_pID].lockUto.add(round_[_rID].holdUto);
+
 
         // call end tx function to fire end tx event.
         endTx(_pID, _team, _eth);

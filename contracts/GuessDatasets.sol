@@ -11,6 +11,7 @@ library GuessDatasets {
         uint256 aff;    // affiliate vault
         uint256 lrnd;   // last round played
         uint256 laff;   // last affiliate id used
+        uint256 uto; // locked uto
     }
 
     struct PlayerRounds {
