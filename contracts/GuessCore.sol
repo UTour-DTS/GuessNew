@@ -60,11 +60,6 @@ contract GuessCore is ProductOwnership, GuessEvents {
     mapping (uint256 => GuessDatasets.Round) public round_; 
     // (rID => pID => data) player data in rounds, by round id and player id
     mapping (uint256 => GuessDatasets.PlayerRounds[]) public rndPlyrs_;
-//****************
-// PRODUCT DATA 
-//****************
-    // (id => product) product data
-    mapping(uint256 => Product) public prdcts_; 
 
 //****************
 // PRODUCT DATA 
@@ -96,9 +91,14 @@ contract GuessCore is ProductOwnership, GuessEvents {
         
         // the creator of contract is defalut merchants
         merchants[msg.sender] = 1;
-
-        // start with the product 0 
-        _createProduct("", "", 0, address(0));
+        
+        // products index start at 1 
+        products.push(Product({
+            name: "zero",
+            disc: "zero",
+            price: 0,
+            createTime: uint64(now)
+        }));
     }
 
 //==============================================================================
@@ -110,7 +110,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
      * been activated. 
      */
     modifier isActivated() {
-        require(activated_ == true, "its not ready yet.  check ?eta in discord"); 
+        require(activated_ == true, "its not ready yet."); 
         _;
     }
     
@@ -143,6 +143,10 @@ contract GuessCore is ProductOwnership, GuessEvents {
     function setERC20(address _address) external onlyCEO {
         erc20 = ERC20(_address);
     } 
+
+    function getTokenBalance(address _address) view public returns (uint256){
+        return erc20.balanceOf(_address);
+    }
 
     // @notice The auction contract variables are defined in ProductFactory to allow
     //  us to refer to them in ProductOwnership to prevent accidental transfers.
@@ -241,6 +245,9 @@ contract GuessCore is ProductOwnership, GuessEvents {
         uint256 _holdUto,
         uint256 _lastStartTime
     ) public returns (uint256 roundID) { 
+
+        require(_maxPlayer >= 2, "must more than 2 players!");
+
         uint256 pid = _createProduct(_name,_disc,_price, msg.sender);
         uint256 rid = _createRound(pid, _percent, _maxPlayer,_holdUto,_lastStartTime); 
         return rid;
@@ -374,7 +381,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
     {   
         require(!round_[_rID].ended);
         require(round_[_rID].plyrMaxCount > round_[_rID].plyrCount);
-        require(round_[_rID].holdUto  <= erc20.balanceOf(msg.sender));
+        require(round_[_rID].holdUto  <= getTokenBalance(msg.sender));
         require(plyrRnds_[_pID][_rID].plyrID == 0); 
         
         // grab time
@@ -466,13 +473,14 @@ contract GuessCore is ProductOwnership, GuessEvents {
     {
         // setup local rID
         uint256 _rID = rID_;
+        uint256 _prdctID = round_[_rID].prdctID;
         
         return
         (
             _rID,                           //0
-            prdcts_[round_[_rID].prdctID].name,              //1
-            prdcts_[round_[_rID].prdctID].disc,              //2
-            prdcts_[round_[_rID].prdctID].price,             //3
+            products[_prdctID].name,              //1
+            products[_prdctID].disc,              //2
+            products[_prdctID].price,             //3
             round_[_rID].plyrCount          //4
         );
     }
@@ -518,10 +526,10 @@ contract GuessCore is ProductOwnership, GuessEvents {
     function buyCore(uint _rID, uint256 _price, uint256 _affID, uint256 _pID, uint256 _team)
         private
     {
-        require(!round_[_rID].ended);
-        require(round_[_rID].plyrMaxCount > round_[_rID].plyrCount);
-        require(round_[_rID].holdUto <= erc20.balanceOf(msg.sender));
-        require(plyrRnds_[_pID][_rID].plyrID == 0); 
+        require(!round_[_rID].ended, "this round is over, join next round");
+        require(round_[_rID].plyrMaxCount > round_[_rID].plyrCount, "more players, join next round");
+        require(round_[_rID].holdUto <= getTokenBalance(msg.sender));
+        require(plyrRnds_[_pID][_rID].plyrID == 0, "already joined");  
         
         // grab time
         uint256 _now = now;
@@ -545,14 +553,14 @@ contract GuessCore is ProductOwnership, GuessEvents {
         private
     {
         GuessDatasets.PlayerRounds memory data = GuessDatasets.PlayerRounds(
-            _pID, erc20.balanceOf(msg.sender), _price, now, _team, false);
-        // update player 
-        // plyrRnds_[_pID][_rID].uto = erc20.balanceOf(msg.sender);
-        // plyrRnds_[_pID][_rID].price = _price;
-        // plyrRnds_[_pID][_rID].timestamp = now;
-        // plyrRnds_[_pID][_rID].team = _team;
-        // plyrRnds_[_pID][_rID].iswin = false;
-        plyrRnds_[_pID][_rID] = data;
+            _pID, getTokenBalance(msg.sender), _price, now, _team, false);
+        // update player round
+        plyrRnds_[_pID][_rID].uto = getTokenBalance(msg.sender);
+        plyrRnds_[_pID][_rID].price = _price;
+        plyrRnds_[_pID][_rID].timestamp = now;
+        plyrRnds_[_pID][_rID].team = _team;
+        plyrRnds_[_pID][_rID].iswin = false;
+        // plyrRnds_[_pID][_rID] = data;
         
         // update round
         round_[_rID].plyrCount = round_[_rID].plyrCount.add(1);
@@ -564,6 +572,9 @@ contract GuessCore is ProductOwnership, GuessEvents {
         // 2% found 10% aff 10% airdrop %n tenant %m players in round
         uint _left = distributeExternal(_rID, _pID, _eth, _affID);
         distributeInternal(_rID, _left);
+
+        // update player
+        plyrs_[_pID].lrnd = _rID;
 
         // call end tx function to fire end tx event.
         endTx(_pID, _team, _eth);
@@ -629,6 +640,10 @@ contract GuessCore is ProductOwnership, GuessEvents {
         uint256 _winID;
         uint256 _winPrice;
         uint256 _winPlyrPrice;
+        address _from;
+        address _to;
+        uint256 _prdctID;
+        
         (_winID, _winPrice, _winPlyrPrice) = calWinner(_rID);
 
         // update round
@@ -641,10 +656,13 @@ contract GuessCore is ProductOwnership, GuessEvents {
         plyrRnds_[_rID][_winID].iswin = true;
 
         //transfer token
-        address _from = productToOwner[round_[_rID].prdctID];
-        address _to = plyrs_[_winID].addr;
+        _prdctID = round_[_rID].prdctID;
+        _from = productToOwner[_prdctID];
+        _to = plyrs_[_winID].addr;
 
-        _transfer(_from, _to, round_[_rID].prdctID);
+        require(_to != address(0), "calc error, no winner.");
+
+        _transfer(_from, _to, _prdctID);
 
         emit GuessEvents.OnEndRound(_rID, _winID, _winPrice, round_[_rID].end, plyrs_[_winID].addr);
     }
@@ -668,6 +686,14 @@ contract GuessCore is ProductOwnership, GuessEvents {
         view 
         returns (uint256, uint256, uint256) 
     {
+        uint256 _winID;
+        uint256 _tmp;
+        uint256 _winPlyrPrice;
+
+        uint256 _winPrice;
+        
+        uint256 _diff;
+
         uint256 seed = uint256(keccak256(abi.encodePacked(
             
             (block.timestamp).add
@@ -677,16 +703,15 @@ contract GuessCore is ProductOwnership, GuessEvents {
             ((uint256(keccak256(abi.encodePacked(msg.sender)))) / (now)).add
             (block.number)
             
-        ))) % 100;
-
-        uint256 _winPrice = prdcts_[round_[_rID].prdctID].price;
-        uint256 _diff = _winPrice;
-        _winPrice = _winPrice.div(100).mul(seed);
-
-        uint256 _winID;
-        uint256 _tmp;
-        uint256 _winPlyrPrice;
+        ))) % 10000;
         
+        
+        uint256 _prdctID = round_[_rID].prdctID;
+        
+        _winPrice = products[_prdctID].price;
+        _diff = _winPrice;
+        _winPrice = _winPrice.div(10000).mul(seed);
+
         for(uint256 i = 0; i < rndPlyrs_[_rID].length; i++){
             if ( rndPlyrs_[_rID][i].price > _winPrice ){
                 _tmp = rndPlyrs_[_rID][i].price.sub(_winPrice);
@@ -737,7 +762,8 @@ contract GuessCore is ProductOwnership, GuessEvents {
         uint256 _percent = round_[_rID].percent;
         uint256 _tenant = _eth.div(100).mul(_percent);
 
-        address _addr = productToOwner[round_[_rID].prdctID];
+        uint256 _prdctID = round_[_rID].prdctID;
+        address _addr = productToOwner[_prdctID];
         tetants_[_addr] = _tenant.add(tetants_[_addr]);
         _left = _left.sub(_tenant);
 
@@ -810,7 +836,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
         activated_ = true;
         
         // lets start first round
-        rID_ = 1;
+        rID_ = 0;
     }
     /**
     use round's rid get round detail and product detail
