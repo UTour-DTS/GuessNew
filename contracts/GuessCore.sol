@@ -27,7 +27,9 @@ contract GuessCore is ProductOwnership, GuessEvents {
     // total valaut for found            
     uint256 private fndValaut_;  
     // total airdrop in this round                  
-    uint256 private airdrop_;                     
+    uint256 private airdrop_; 
+    // amount of players who in airdrop
+    uint256 private airdropCount_ = 5;   
 
     /// @dev erc20 token contract for holding require. it"s UTO by default. 
     ERC20 private erc20;
@@ -165,6 +167,13 @@ contract GuessCore is ProductOwnership, GuessEvents {
     function setRoundMaxPlayers(uint256 _maxPlayers) external onlyCEO {
         rndMaxNum_ = _maxPlayers;
     }
+
+    /**
+    set count of players in airdrop 
+     */
+    function setAirdropCount(uint256 _maxPlayers) external onlyCEO {
+        airdropCount_ = _maxPlayers;
+    }
   
 //==============================================================================
 // use these to interact with contract
@@ -179,8 +188,11 @@ contract GuessCore is ProductOwnership, GuessEvents {
         uint256 _maxPlayer,
         uint256 _holdUto,
         uint256 _lastStartTime
-    ) public onlyMCH returns (uint256 roundID) { 
-
+    ) 
+        public 
+        onlyMCH 
+        returns (uint256 roundID) 
+    { 
         require(_maxPlayer >= 2, "must more than 2 players!");
 
         uint256 pid = _createProduct(_name,_disc,_price, msg.sender);
@@ -518,20 +530,103 @@ contract GuessCore is ProductOwnership, GuessEvents {
         emit GuessEvents.OnEndRound(_rID, _winID, _winPrice, round_[_rID].end, plyrs_[_winID].addr);
     }
     
+
+
     /**
      * @dev generates a random number between 0-99 and checks to see if thats
      * resulted in an airdrop win
      * @return do we have a winner?
      */
-    // function airdrop()
-    //     private  
-    //     returns(bool)
-    // {
+    function lottyAirdrop(uint256 _valaut)
+        external
+        onlyCEO  
+        returns(bool)
+    {
+        require(_valaut <= airdrop_, "not enough airdrop valaut");
+        uint256 _airdropCount = getAirdropCount();
+        require(_airdropCount >=1, "no one played");
+        uint256[] memory _airdopPlayers = getAirdropPlayers(_airdropCount);
+        // 
+        uint256 _tmpPID = 0;
+        uint256 _avgValaut = _valaut.div(_airdropCount);
+        for(uint256 i = 0; i < _airdopPlayers.length; i++){
+            _tmpPID = _airdopPlayers[i];
+            plyrs_[_tmpPID].airdrop = _avgValaut;
+        }
+    }
+
+    /***
+     * @dev if total player less than airdropCount_, then all players
+     * returns less between airdropCount_ and pID_
+     */
+    function getAirdropCount() 
+        private 
+        view 
+        returns (uint256)
+    {
+        if (airdropCount_ > pID_){
+            return pID_;
+        }
+        return airdropCount_;
+    }
+
+    /***
+     * @dev getAirdropPlayers who will get airdrop
+     */
+    function getAirdropPlayers(uint256 _count) 
+        private 
+        view 
+        returns (uint256[] memory _airdropPlayers) 
+    {
+        uint256[] memory pidArr = new uint256[](_count);
+        uint256 i = 0;
+        uint256 nonce = 1;
+        uint256 random;
+        while (i < _count) {
+            random = getRandomPlayerID(nonce);
+            if ( !existInArray(random, pidArr)){
+                pidArr[i] = random;
+                i++;
+            }
+            nonce++;
+        }
+
+        return pidArr;
+    }
+
+    function existInArray(uint256 _pID, uint256[] memory arr) 
+        private 
+        pure 
+        returns(bool) 
+    {
+        bool _exist = false;
+        for(uint32 i = 0; i < arr.length; i++){
+            if(arr[i] == _pID) {
+                _exist = true;
+                break;
+            }
+        }
         
+        return _exist;
+    }
 
-    //     // 
-    // }
+    function getRandomPlayerID(uint256 idx) 
+        private
+        view 
+        returns (uint256)
+    {
+        uint256 random = uint256(keccak256(abi.encodePacked(
+            (block.difficulty).add(idx))));
+        return  random % pID_;
+    }
 
+    /***
+     * @dev calculate random winprice and the winner
+     * @param _rID round id
+     *  winID winner's playerID
+        winPrice random price for award
+        winPlyrPrice price of player who is winner
+     */
     function calWinner(uint256 _rID) 
         private
         view 
@@ -691,8 +786,10 @@ contract GuessCore is ProductOwnership, GuessEvents {
     /**
     use round's rid get round detail and product detail
      */
-    function getRoundProductDetail(uint256 _rid) public view 
-    returns(uint256 _plyrCount,uint256 _plyrMaxCount,uint256 _prdctID,uint256 _price,uint256 _plyr, bool _ended,  string _name, 
+    function getRoundProductDetail(uint256 _rid) 
+        public 
+        view 
+        returns(uint256 _plyrCount,uint256 _plyrMaxCount,uint256 _prdctID,uint256 _price,uint256 _plyr, bool _ended,  string _name, 
         string _disc, uint256 _referencePrice)
     {
         GuessDatasets.Round storage  round = round_[_rid];
@@ -701,8 +798,10 @@ contract GuessCore is ProductOwnership, GuessEvents {
         return (round.plyrCount,round.plyrMaxCount,round.prdctID,round.price,round.plyr,round.ended,product.name,product.disc,product.price);
     }
 
-    function getPlayerByAddress(address _walletAddress,uint256 _rid) public view 
-    returns(uint256 _plyrID,uint256 _uto,uint256 _price,uint256 _timestamp,bool _iswin)
+    function getPlayerByAddress(address _walletAddress,uint256 _rid) 
+        public 
+        view 
+        returns(uint256 _plyrID,uint256 _uto,uint256 _price,uint256 _timestamp,bool _iswin)
     {
         require(_walletAddress != address(0),"_walletAddress must be not empty");
         uint256 plyid = pIDxAddr_[_walletAddress];
@@ -711,9 +810,9 @@ contract GuessCore is ProductOwnership, GuessEvents {
     }
 
     function getActiveRounds()
-    public  
-    view
-    returns (uint256[] memory _rids)
+        public  
+        view
+        returns (uint256[] memory _rids)
     {
         uint256[] memory  ridArr;
         if(rID_ > rID_limit)
