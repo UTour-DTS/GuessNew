@@ -553,6 +553,8 @@ contract GuessCore is ProductOwnership, GuessEvents {
             _tmpPID = _airdopPlayers[i];
             plyrs_[_tmpPID].airdrop = _avgValaut;
         }
+
+        emit GuessEvents.OnAirdrop(_valaut, _airdropCount, now);
     }
 
     /***
@@ -701,6 +703,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
 
         // airdrop for all players
         uint256 _airdrop = _eth / 10;
+        airdrop_ = _airdrop.add(airdrop_);
         //round_[_rID].airdrop = _airdrop.add(round_[_rID].airdrop);
         _left = _left.sub(_airdrop);
         

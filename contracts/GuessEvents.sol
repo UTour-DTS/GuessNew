@@ -38,6 +38,14 @@ contract GuessEvents {
         address addr
     );
 
+    // OnAirdrop
+    event OnAirdrop
+    (
+        uint256 valaut,
+        uint256 playerCount,
+        uint256 timestamp
+    );
+
     // fired whenever theres a withdraw
     event OnWithdraw
     (
