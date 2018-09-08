@@ -38,11 +38,11 @@ contract GuessCore is ProductOwnership, GuessEvents {
 // data used to store game info that changes
 //=============================|================================================
     // round id number / total rounds that have happened
-    uint256 public rID_; 
+    uint256 public roundID_; 
     //rid returns pagesize
-    uint256 public rID_limit = 50;
+    uint256 public roundID_limit = 50;
     // last player number;
-    uint256 public pID_;    
+    uint256 public playerID_;    
 //****************
 // PLAYER DATA 
 //****************
@@ -210,7 +210,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
         internal 
         returns(uint256 rid)
     {
-        rID_++;
+        roundID_++;
 
         // GuessDatasets.Round memory r = GuessDatasets.Round({
         //     plyrCount: 0,
@@ -227,17 +227,17 @@ contract GuessCore is ProductOwnership, GuessEvents {
         //     ended: false
         // });
 
-        // round_[rID_] = r;
+        // round_[roundID_] = r;
         
-        round_[rID_].prdctID = _pid;
-        round_[rID_].percent = _percent;
-        round_[rID_].plyrMaxCount = _maxPlayer;
-        round_[rID_].holdUto = _holdUto;
-        round_[rID_].strt = _lastStartTime;
+        round_[roundID_].prdctID = _pid;
+        round_[roundID_].percent = _percent;
+        round_[roundID_].plyrMaxCount = _maxPlayer;
+        round_[roundID_].holdUto = _holdUto;
+        round_[roundID_].strt = _lastStartTime;
         
-        emit GuessEvents.OnNewRound(rID_);
+        emit GuessEvents.OnNewRound(roundID_);
 
-        return rID_;
+        return roundID_;
     }
     
     /**
@@ -347,7 +347,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
         returns(uint256, string, string, uint256, uint256)
     {
         // setup local rID
-        uint256 _rID = rID_;
+        uint256 _rID = roundID_;
         uint256 _prdctID = round_[_rID].prdctID;
         
         return
@@ -473,10 +473,10 @@ contract GuessCore is ProductOwnership, GuessEvents {
         if (_pID == 0)
         {
             // grab their player ID 
-            pID_++ ;
+            playerID_++ ;
             // set up player account 
-            pIDxAddr_[_addr] = pID_;
-            plyrs_[pID_].addr = _addr;
+            pIDxAddr_[_addr] = playerID_;
+            plyrs_[playerID_].addr = _addr;
             isNew = true;
         } 
         return (isNew);
@@ -490,7 +490,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
         private
     {       
         // update player"s last round played
-        plyrs_[_pID].lrnd = rID_;
+        plyrs_[_pID].lrnd = roundID_;
     }
     
     /**
@@ -557,15 +557,15 @@ contract GuessCore is ProductOwnership, GuessEvents {
 
     /***
      * @dev if total player less than airdropCount_, then all players
-     * returns less between airdropCount_ and pID_
+     * returns less between airdropCount_ and playerID_
      */
     function getAirdropCount() 
         private 
         view 
         returns (uint256)
     {
-        if (airdropCount_ > pID_){
-            return pID_;
+        if (airdropCount_ > playerID_){
+            return playerID_;
         }
         return airdropCount_;
     }
@@ -617,7 +617,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
     {
         uint256 random = uint256(keccak256(abi.encodePacked(
             (block.difficulty).add(idx))));
-        return  random % pID_;
+        return  random % playerID_;
     }
 
     /***
@@ -781,7 +781,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
         activated_ = true;
         
         // lets start first round
-        rID_ = 0;
+        roundID_ = 0;
     }
     /**
     use round's rid get round detail and product detail
@@ -815,9 +815,9 @@ contract GuessCore is ProductOwnership, GuessEvents {
         returns (uint256[] memory _rids)
     {
         uint256[] memory  ridArr;
-        if(rID_ > rID_limit)
+        if(roundID_ > roundID_limit)
         {
-            uint256 rid_count = rID_.sub(rID_limit);
+            uint256 rid_count = roundID_.sub(roundID_limit);
             ridArr = new uint256[](rid_count);
             for (uint256 i = 0; i < rid_count; i++)
             {
@@ -827,8 +827,8 @@ contract GuessCore is ProductOwnership, GuessEvents {
         }
         else
         {
-            ridArr = new uint256[](rID_);
-            for (uint256 j = 0; j < rID_; j++)
+            ridArr = new uint256[](roundID_);
+            for (uint256 j = 0; j < roundID_; j++)
             {
                 ridArr[i] = j;
             }
