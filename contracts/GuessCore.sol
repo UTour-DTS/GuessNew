@@ -200,28 +200,29 @@ contract GuessCore is ProductOwnership, GuessEvents {
     {
         rID_++;
 
-        GuessDatasets.Round memory r = GuessDatasets.Round({
-            plyrCount: 0,
-            plyrMaxCount: _maxPlayer,
-            prdctID: _pid, 
-            percent: _percent,
-            holdUto: _holdUto,
-            eth: 0, 
-            pot: 0, 
-            strt: _lastStartTime,
-            end: 0,
-            price: 0,
-            plyr: 0, 
-            ended: false
-        });
+        // GuessDatasets.Round memory r = GuessDatasets.Round({
+        //     plyrCount: 0,
+        //     plyrMaxCount: _maxPlayer,
+        //     prdctID: _pid, 
+        //     percent: _percent,
+        //     holdUto: _holdUto,
+        //     eth: 0, 
+        //     pot: 0, 
+        //     strt: _lastStartTime,
+        //     end: 0,
+        //     price: 0,
+        //     plyr: 0, 
+        //     ended: false
+        // });
 
-        round_[rID_] = r;
+        // round_[rID_] = r;
         
-        // round_[rID_].plyrMaxCount = _maxPlayer;
-        // round_[rID_].prdctID = _pid;
-        // round_[rID_].percent = _percent;
-        // round_[rID_].strt = _lastStartTime;
-        // round_[rID_].holdUto = _holdUto;
+        round_[rID_].prdctID = _pid;
+        round_[rID_].percent = _percent;
+        round_[rID_].plyrMaxCount = _maxPlayer;
+        round_[rID_].holdUto = _holdUto;
+        round_[rID_].strt = _lastStartTime;
+        
         emit GuessEvents.OnNewRound(rID_);
 
         return rID_;
@@ -364,7 +365,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
     {   
         if (_addr == address(0))
         {
-            _addr == msg.sender;
+            _addr = msg.sender;
         }
         uint256 _pID = pIDxAddr_[_addr];
         uint256 _rID = plyrs_[_pID].lrnd;
@@ -390,8 +391,10 @@ contract GuessCore is ProductOwnership, GuessEvents {
     {
         require(!round_[_rID].ended, "this round is over, join next round");
         require(round_[_rID].plyrMaxCount > round_[_rID].plyrCount, "more players, join next round");
-        require(round_[_rID].holdUto <= getTokenBalance(msg.sender).sub(plyrs_[_pID].lockUto), "not holding enough uto");
         require(plyrRnds_[_pID][_rID].plyrID == 0, "already joined");  
+
+        uint256 holdToken = getTokenBalance(msg.sender);
+        require(round_[_rID].holdUto <= holdToken.sub(plyrs_[_pID].lockUto), "not holding enough uto");
         
         // grab time
         uint256 _now = now;
@@ -501,6 +504,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
 
         // update player
         plyrRnds_[_rID][_winID].iswin = true;
+        plyrs_[_winID].lockUto = plyrs_[_winID].lockUto.sub(plyrRnds_[_rID][_winID].uto);
 
         //transfer token
         _prdctID = round_[_rID].prdctID;
@@ -706,8 +710,10 @@ contract GuessCore is ProductOwnership, GuessEvents {
         return (plyrounds.plyrID,plyrounds.uto,plyrounds.price,plyrounds.timestamp,plyrounds.iswin);
     }
 
-    function getActiveRounds() public  view
-    returns (uint256[] memory  _rids)
+    function getActiveRounds()
+    public  
+    view
+    returns (uint256[] memory _rids)
     {
         uint256[] memory  ridArr;
         if(rID_ > rID_limit)
