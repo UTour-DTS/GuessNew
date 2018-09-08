@@ -40,7 +40,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
     // round id number / total rounds that have happened
     uint256 public roundID_; 
     //rid returns pagesize
-    uint256 public roundID_limit = 50;
+    uint256 public pageSize_ = 50;
     // last player number;
     uint256 public playerID_;    
 //****************
@@ -815,9 +815,9 @@ contract GuessCore is ProductOwnership, GuessEvents {
         returns (uint256[] memory _rids)
     {
         uint256[] memory  ridArr;
-        if(roundID_ > roundID_limit)
+        if(roundID_ > pageSize_)
         {
-            uint256 rid_count = roundID_.sub(roundID_limit);
+            uint256 rid_count = roundID_.sub(pageSize_);
             ridArr = new uint256[](rid_count);
             for (uint256 i = 0; i < rid_count; i++)
             {
