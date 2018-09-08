@@ -819,11 +819,10 @@ contract GuessCore is ProductOwnership, GuessEvents {
         {
             uint256 rid_count = roundID_.sub(pageSize_);
             ridArr = new uint256[](rid_count);
-            for (uint256 i = 0; i < rid_count; i++)
+            for (uint256 i = 0; i < pageSize_; i++)
             {
                 ridArr[i] = rid_count.add(i);
             }
-         
         }
         else
         {
