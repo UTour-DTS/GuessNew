@@ -17,6 +17,7 @@ contract GuessEvents {
         uint256 pID,
         uint256 price,
         uint256 affID,
+        uint256 timestamp,
         address addr
     );
     

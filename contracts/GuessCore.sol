@@ -28,7 +28,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
     uint256 private fndValaut_;  
     // total airdrop in this round                  
     uint256 private airdrop_; 
-    // amount of players who in airdrop
+    // amount of players who in airdrop
     uint256 private airdropCount_ = 5;   
 
     /// @dev erc20 token contract for holding require. it"s UTO by default. 
@@ -274,7 +274,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
         // buy core 
         buyCore(_rID, _price, _affCode, _pID);
 
-        emit GuessEvents.OnGuess(_rID, _pID, _price, _affCode, msg.sender);
+        emit GuessEvents.OnGuess(_rID, _pID, _price, _affCode, now, msg.sender);
     }
 
     /**
