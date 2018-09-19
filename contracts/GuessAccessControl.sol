@@ -93,18 +93,13 @@ contract GuessAccessControl {
 
     /// @dev Add new merchat
     function addMerchant(address _newMCH) external onlyCEO {
-        require(_newMCH != address(0), "invalid address: 0");
-        require(merchants[_newMCH] == 0, "already exists" );
-
+        require(_newMCH != address(0));
         merchants[_newMCH] = 1;
     }
     
-    /// @dev remove merchants
-    function removeMerchant(address _merchant) external onlyCEO {
-        require(_merchant != address(0), "invalid address: 0");
-        require(merchants[_merchant] == 1, "not exists");
-        
-        merchants[_merchant] = 0;
+    /// @dev remove merchant
+    function removeMerchant(address _newMCH) external onlyCEO {
+        merchants[_newMCH] = 0;
     }
 
     /// @dev Modifier to allow actions only when the contract IS NOT paused
