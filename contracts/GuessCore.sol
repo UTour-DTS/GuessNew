@@ -532,8 +532,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
      */
     function lottyAirdrop(uint256 _valaut)
         external
-        onlyCEO  
-        returns(bool)
+        onlyCEO
     {
         require(_valaut <= airdrop_, "not enough airdrop valaut");
         uint256 _airdropCount = getAirdropCount();
