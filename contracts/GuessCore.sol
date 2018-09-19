@@ -72,9 +72,6 @@ contract GuessCore is ProductOwnership, GuessEvents {
     GuessDatasets.Divide private divide_; 
     
     constructor () public {
-        // Starts paused.
-        // paused = true;
-
         // the creator of the contract is the initial CEO
         ceoAddress = msg.sender;
 
@@ -190,7 +187,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
         onlyMCH 
         returns (uint256 roundID) 
     { 
-        require(_maxPlayer >= 2, "must more than 2 players!");
+        require(_maxPlayer > 1, "must more than 2 players!");
 
         uint256 pid = _createProduct(_name,_disc,_price, msg.sender);
         uint256 rid = _createRound(pid, _percent, _maxPlayer,_holdUto,_lastStartTime); 
@@ -430,7 +427,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
             _pID, getTokenBalance(msg.sender), _price, now, false);
         // update player round
         plyrRnds_[_pID][_rID].plyrID = _pID;
-        plyrRnds_[_pID][_rID].uto =  getTokenBalance(msg.sender);
+        plyrRnds_[_pID][_rID].uto = getTokenBalance(msg.sender);
         plyrRnds_[_pID][_rID].price = _price;
         plyrRnds_[_pID][_rID].timestamp = now;
         plyrRnds_[_pID][_rID].iswin = false;
@@ -449,7 +446,6 @@ contract GuessCore is ProductOwnership, GuessEvents {
         // update player
         plyrs_[_pID].lrnd = _rID;
         plyrs_[_pID].lockUto = plyrs_[_pID].lockUto.add(round_[_rID].holdUto);
-
 
         // call end tx function to fire end tx event.
         endTx(_pID, _eth);
@@ -541,7 +537,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
     {
         require(_valaut <= airdrop_, "not enough airdrop valaut");
         uint256 _airdropCount = getAirdropCount();
-        require(_airdropCount >=1, "no one played");
+        require(_airdropCount > 0, "no one played");
         uint256[] memory _airdopPlayers = getAirdropPlayers(_airdropCount);
         // 
         uint256 _tmpPID = 0;
@@ -631,13 +627,9 @@ contract GuessCore is ProductOwnership, GuessEvents {
         view 
         returns (uint256, uint256, uint256) 
     {
-        uint256 _winID;
         uint256 _tmp;
-        uint256 _winPlyrPrice;
 
         uint256 _winPrice;
-        
-        uint256 _diff;
 
         uint256 seed = uint256(keccak256(abi.encodePacked(
             
@@ -653,18 +645,26 @@ contract GuessCore is ProductOwnership, GuessEvents {
         
         uint256 _prdctID = round_[_rID].prdctID;
         
-        _winPrice = products[_prdctID].price;
-        _diff = _winPrice;
-        _winPrice = _winPrice.div(10000).mul(seed);
+        _winPrice = products[_prdctID].price.div(10000).mul(seed);
 
+        if ( rndPlyrs_[_rID][0].price > _winPrice ){
+            _tmp = rndPlyrs_[_rID][0].price.sub(_winPrice);
+        } else {
+            _tmp = _winPrice.sub(rndPlyrs_[_rID][0].price);
+        }
+
+        uint256 _diff = _tmp;
+        uint256 _winID = rndPlyrs_[_rID][0].plyrID;
+        uint256 _winPlyrPrice = rndPlyrs_[_rID][0].price;
+        
         for(uint256 i = 0; i < rndPlyrs_[_rID].length; i++){
             if ( rndPlyrs_[_rID][i].price > _winPrice ){
                 _tmp = rndPlyrs_[_rID][i].price.sub(_winPrice);
             } else {
                 _tmp = _winPrice.sub(rndPlyrs_[_rID][i].price);
             }
-
-            if (_tmp < _diff ){
+            
+            if ( _tmp < _diff ){
                 _diff = _tmp;
                 _winID = rndPlyrs_[_rID][i].plyrID;
                 _winPlyrPrice = rndPlyrs_[_rID][i].price;
