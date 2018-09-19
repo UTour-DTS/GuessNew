@@ -31,3 +31,10 @@
 + 玩家调用 withdrawValaut ，提取所有余额
    + 余额必须满0.1 ETH 以上再提取，具体数量可以设置 setMinWithDraw
    + 一次将所有余额都取出，不可分批取
+
+# infura 测试地址
+
+| -        | 合约地址    |  主钱包地址  |
+| --------   | :-----   | :---- |
+| GUESS | 0xFb478045cee8Cc8Db2967b6fA5474C9c09687D3D | 0xaFd77214584D13A6519762D679E3089899b0019a |
+| UTO | 0x2105C2cadC46acF4aB7D4Dcb3fd92F04481195e5 | - |

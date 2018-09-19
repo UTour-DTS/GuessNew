@@ -83,14 +83,6 @@ contract GuessCore is ProductOwnership, GuessEvents {
         
         // the creator of contract is defalut merchants
         merchants[msg.sender] = 1;
-        
-        // products index start at 1 
-        products.push(Product({
-            name: "zero",
-            disc: "zero",
-            price: 0,
-            createTime: now
-        }));
     }
 
 //==============================================================================
@@ -432,6 +424,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
         GuessDatasets.PlayerRounds memory data = GuessDatasets.PlayerRounds(
             _pID, getTokenBalance(msg.sender), _price, now, false);
         // update player round
+        plyrRnds_[_pID][_rID].plyrID = _pID;
         plyrRnds_[_pID][_rID].uto =  getTokenBalance(msg.sender);
         plyrRnds_[_pID][_rID].price = _price;
         plyrRnds_[_pID][_rID].timestamp = now;
