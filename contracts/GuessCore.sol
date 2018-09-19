@@ -83,6 +83,11 @@ contract GuessCore is ProductOwnership, GuessEvents {
         
         // the creator of contract is defalut merchants
         merchants[msg.sender] = 1;
+        
+        // init 
+        playerID_ = 0;
+        // lets start first round
+        roundID_ = 0;
     }
 
 //==============================================================================
@@ -774,9 +779,6 @@ contract GuessCore is ProductOwnership, GuessEvents {
         
         // activate the contract 
         activated_ = true;
-        
-        // lets start first round
-        roundID_ = 0;
     }
     /**
     use round's rid get round detail and product detail
