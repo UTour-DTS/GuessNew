@@ -28,10 +28,10 @@ contract ProductFactory is GuessAccessControl {
     ///  is important because of the byte-packing rules used by Ethereum.
     ///  Ref: http://solidity.readthedocs.io/en/develop/miscellaneous.html
     struct Product {
-        // name of product in Chinese.
+        // name of product in english.
         string name;
 
-        // discription of product in Chinese.
+        // discription of product in English.
         string disc;
 
         // reference price for the market.
@@ -40,12 +40,6 @@ contract ProductFactory is GuessAccessControl {
         // The timestamp from the block when this cat came into existence.
         uint256 createTime;
     }
-
-    /*** CONSTANTS ***/
-
-    // An approximation of currently how many seconds are in between blocks.
-    uint256 public secondsPerBlock = 15;
-
     /*** STORAGE ***/
 
     /// @dev An array containing the Products struct for all Product in existence. The ID
@@ -85,8 +79,8 @@ contract ProductFactory is GuessAccessControl {
     ///  method doesn"t do any checking and should only be called when the
     ///  input data is known to be valid. Will generate both a CreateProduct event
     ///  and a Transfer event.
-    /// @param _name The name of product in Chinese.
-    /// @param _disc The discription of product in Chinese.
+    /// @param _name The name of product in English.
+    /// @param _disc The discription of product in English.
     /// @param _price The reference price of Product for the market.
     /// @param _owner The inital owner of this product, must be non-zero.
     function _createProduct(
@@ -122,11 +116,5 @@ contract ProductFactory is GuessAccessControl {
         _transfer(address(0), _owner, newProductId);
 
         return newProductId;
-    }
-
-    // Any C-level can fix how many seconds per blocks are currently observed.
-    function setSecondsPerBlock(uint256 secs) external onlyCLevel {
-        require(secs > 0);
-        secondsPerBlock = secs;
     }
 }
