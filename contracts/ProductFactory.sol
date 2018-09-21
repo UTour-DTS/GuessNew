@@ -22,11 +22,6 @@ contract ProductFactory is GuessAccessControl {
     event Transfer(address from, address to, uint256 tokenId);
     
     /*** DATA TYPES ***/
-    /// @dev The main Product struct. Every product in GUESS is represented by a copy
-    ///  of this structure, so great care was taken to ensure that it fits neatly into
-    ///  exactly two 256-bit words. Note that the order of the members in this structure
-    ///  is important because of the byte-packing rules used by Ethereum.
-    ///  Ref: http://solidity.readthedocs.io/en/develop/miscellaneous.html
     struct Product {
         // name of product in english.
         string name;

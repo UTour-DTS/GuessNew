@@ -31,41 +31,41 @@ contract GuessCore is ProductOwnership, GuessEvents {
 
     ERC20 public erc20;
 
-//*****************
+//*******
 // data used to store game info that changes
-//*****************
-    // round id number / total rounds that have happened
+//*******
+    // total rounds that have happened
     uint256 public roundID_; 
     // last player number;
     uint256 public playerID_; 
     //rid returns pagesize
     uint256 public pageSize_ = 50;   
-//****************
+//*******
 // PLAYER DATA 
-//****************
+//*******
     // (addr => pID) returns player id by address
     mapping (address => uint256) public pIDxAddr_;
     // (pID => data) player data       
     mapping (uint256 => GuessDatasets.Player) public plyrs_;   
     // (pID => rID => data) player round data by player id & round id
     mapping (uint256 => mapping (uint256 => GuessDatasets.PlayerRounds)) public plyrRnds_;  
-//****************
+//*******
 // ROUND DATA 
-//****************
+//*******
     // (rID => data) round data
     mapping (uint256 => GuessDatasets.Round) public round_; 
     // (rID => pID => data) player data in rounds, by round id and player id
     mapping (uint256 => GuessDatasets.PlayerRounds[]) public rndPlyrs_;
 
-//****************
+//*******
 // PRODUCT DATA 
-//****************
+//*******
     // (address => valaut) valaut of tetants sell product
     mapping(address => uint256) public tetants_; 
  
-//****************
+//*******
 // DIVIDE
-//****************
+//*******
     GuessDatasets.Divide private divide_; 
     
     constructor () public {
@@ -77,19 +77,13 @@ contract GuessCore is ProductOwnership, GuessEvents {
         roundID_ = 0;
     }
 
-//****************
-// these are safety checks
+//*******
 // modifiers
-//****************
-    /**
-     * @dev used to make sure no one can interact with contract until it has 
-     * been activated. 
-     */
+//*******
     modifier isActivated() {
         require(activated_ == true, "its not ready yet."); 
         _;
     }
-    
     /**
      * @dev prevents contracts from interacting with fomo3d 
      */
@@ -101,7 +95,6 @@ contract GuessCore is ProductOwnership, GuessEvents {
         require(_codeLength == 0, "sorry humans only");
         _;
     }
-
     /**
      * @dev sets boundaries for incoming tx 
      */
@@ -110,10 +103,9 @@ contract GuessCore is ProductOwnership, GuessEvents {
         require(_eth <= 100000000000000000000000, "no vitalik, no");
         _;    
     }
-
-//****************
-// use these to sell product
-//****************
+//*******
+// settings
+//*******
     function setERC20(address _address) external onlyCEO {
         erc20 = ERC20(_address);
     } 
@@ -146,9 +138,9 @@ contract GuessCore is ProductOwnership, GuessEvents {
         airdropCount_ = _maxPlayers;
     }
   
-//****************
+//*******
 // use these to interact with contract
-//====|=========================================================================
+//*******
     /** @dev create round
      */
     function createRound (
@@ -164,7 +156,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
         onlyMCH 
         returns (uint256 roundID) 
     { 
-        require(_maxPlayer > 1, "must more than 2 players!");
+        require(_maxPlayer > 1, "must 2+ players!");
 
         uint256 pid = _createProduct(_name,_disc,_price, msg.sender);
         uint256 rid = _createRound(pid, _percent, _maxPlayer,_holdUto,_lastStartTime); 
@@ -241,16 +233,16 @@ contract GuessCore is ProductOwnership, GuessEvents {
 
         uint256 _eth = withdrawEarnings(_pID);
 
-        require(_eth > wthdMin_, "valaut must more than min withdraw");
+        require(_eth > wthdMin_, "must more than min withdraw");
 
         if (_eth > 0)
             plyrs_[_pID].addr.transfer(_eth);
 
         emit GuessEvents.OnWithdraw(_pID, msg.sender, _eth, _now);
     }
-//****************
+//*******
 // (for UI & viewing things on etherscan)
-//****************
+//*******
     /**
      * @dev returns player earnings per vaults 
      * @return general / airdrop /affiliate vault
@@ -266,7 +258,6 @@ contract GuessCore is ProductOwnership, GuessEvents {
             plyrs_[_pID].aff
         );
     }
-
     /**
      * @dev returns all current round info needed for front end
      * @return eth invested during ICO phase
@@ -295,11 +286,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
      * @dev returns player info based on address.  if no address is given, it will 
      * use msg.sender 
      * @param _addr address of the player you want to lookup 
-     * @return player id
-     * @return general vault 
-     * @return airdrop vault
-     * @return affiliate vault 
-	 * @return player last round price
+     * @return player id, general vault, airdrop vault,affiliate vault,player last round price
      */
     function getPlayerInfoByAddress(address _addr)
         public 
@@ -331,9 +318,9 @@ contract GuessCore is ProductOwnership, GuessEvents {
         );
     }
 
-//****************
-// this + tools + calcs + modules = our softwares engine
-//****************
+//*******
+// engine
+//*******
     /**
      * @dev logic runs whenever a buy order is executed.  determines how to handle 
      * incoming eth depending on if we are in an active round or not
@@ -341,7 +328,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
     function buyCore(uint _rID, uint256 _price, uint256 _affID, uint256 _pID)
         private
     {
-        require(!round_[_rID].ended, "this round is over, join next round");
+        require(!round_[_rID].ended, "round over, join next round");
         require(round_[_rID].plyrMaxCount > round_[_rID].plyrCount, "more players, join next round");
         require(plyrRnds_[_pID][_rID].plyrID == 0, "already joined");  
 
@@ -390,13 +377,8 @@ contract GuessCore is ProductOwnership, GuessEvents {
         // update player
         plyrs_[_pID].lrnd = _rID;
         plyrs_[_pID].lockUto = plyrs_[_pID].lockUto.add(round_[_rID].holdUto);
-
-        // call end tx function to fire end tx event.
-        endTx(_pID, _eth);
     }
-//****************
-// tools
-//**************** 
+    
     /**
      * @dev gets existing or registers new pID.  use this when a player may be new
      * @return pID 
@@ -459,7 +441,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
         _from = productToOwner[_prdctID];
         _to = plyrs_[_winID].addr;
 
-        require(_to != address(0), "calc error, no winner.");
+        require(_to != address(0), "no winner");
 
         _transfer(_from, _to, _prdctID);
 
@@ -477,9 +459,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
     }
 
     /**
-     * @dev generates a random number between 0-99 and checks to see if thats
-     * resulted in an airdrop win
-     * @return do we have a winner?
+     * @dev airdrop to random players
      */
     function lottyAirdrop(uint256 _valaut)
         external
@@ -487,7 +467,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
     {
         require(_valaut <= airdrop_, "not enough airdrop valaut");
         uint256 _airdropCount = getAirdropCount();
-        require(_airdropCount > 0, "no one played");
+        require(_airdropCount > 0, "no player");
         uint256[] memory _airdopPlayers = getAirdropPlayers(_airdropCount);
 
         uint256 _tmpPID = 0;
@@ -692,42 +672,20 @@ contract GuessCore is ProductOwnership, GuessEvents {
 
         return(_earnings);
     }
-    
-    /**
-     * @dev prepares compression data and fires event for buy or reload tx"s
-     */
-    function endTx(uint256 _pID, uint256 _eth)
-        private
-    {
-        emit GuessEvents.OnEndTx
-        (
-            msg.sender,
-            _pID,
-            _eth
-        );
-    }
 
-    /** upon contract deploy, it will be deactivated.  this is a one time
-     * use function that will activate the contract.  we do this so devs 
-     * have time to set things up on the web end
+    /** 
+     * only called by one time
      **/
     bool public activated_ = false;
     function activate()
         public
         onlyCLevel
     {
-		// make sure that its been linked.
         require(address(erc20) != address(0), "must link to other token first");
-        
-        // can only be ran once
         require(activated_ == false, "Guess already activated");
-        
-        // activate the contract 
         activated_ = true;
     }
-    /**
-    use round's rid get round detail and product detail
-     */
+
     function getRoundProductDetail(uint256 _rid) 
         public 
         view 
@@ -741,13 +699,13 @@ contract GuessCore is ProductOwnership, GuessEvents {
             product.disc,product.price, plyrs_[round.plyr].addr);
     }
 
-    function getPlayerByAddress(address _walletAddress,uint256 _rid) 
+    function getPlayerByAddress(address _addr,uint256 _rid) 
         public 
         view 
         returns(uint256 _plyrID,uint256 _uto,uint256 _price,uint256 _timestamp,bool _iswin)
     {
-        require(_walletAddress != address(0),"_walletAddress must be not empty");
-        uint256 plyid = pIDxAddr_[_walletAddress];
+        require(_addr != address(0),"wallet is empty");
+        uint256 plyid = pIDxAddr_[_addr];
         GuessDatasets.PlayerRounds storage plyrounds = plyrRnds_[plyid][_rid];
         return (plyrounds.plyrID,plyrounds.uto,plyrounds.price,plyrounds.timestamp,plyrounds.iswin);
     }

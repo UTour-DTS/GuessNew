@@ -15,13 +15,6 @@ contract GuessAccessControl {
     //     - The COO: The COO can manual start and end the game.
     //
     //     - The MCH: The MCH can create and distribute Products.
-    //
-    // It should be noted that these roles are distinct without overlap in their access abilities, the
-    // abilities listed for each role above are exhaustive. In particular, while the CEO can assign any
-    // address to any role, the CEO address itself doesn"t have the ability to act in those roles. This
-    // restriction is intentional so that we aren"t tempted to use the CEO address frequently out of
-    // convenience. The less we use an address, the less likely it is that we somehow compromise the
-    // account.
 
     /// @dev Emited when contract is upgraded - See README.md for updgrade plan
     event ContractUpgrade(address newContract);

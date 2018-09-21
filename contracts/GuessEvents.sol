@@ -21,14 +21,6 @@ contract GuessEvents {
         address addr
     );
     
-    // fired at end of buy or reload
-    event OnEndTx
-    (
-        address playerAddress,
-        uint256 playerID,
-        uint256 ethIn
-    );
-    
     // OnEndRound
     event OnEndRound
     (
