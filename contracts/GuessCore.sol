@@ -13,21 +13,21 @@ contract GuessCore is ProductOwnership, GuessEvents {
     using SafeMath for *;
 
     // price of guess
-    uint256 public rndPrz_ = .001 ether; 
+    uint256 private rndPrz_ = .001 ether; 
     // min withdraw value         
-    uint256 public wthdMin_ = .1 ether; 
+    uint256 private wthdMin_ = .1 ether; 
     // amount of round at the same time          
-    uint256 public rndNum_ = 1; 
+    uint256 private rndNum_ = 1; 
     // max amount of players in one round                 
-    uint256 public rndMaxNum_ = 200;   
+    uint256 private rndMaxNum_ = 200;   
     // max percent of pot for product           
-    uint256 public rndMaxPrcnt_ = 50; 
+    uint256 private rndMaxPrcnt_ = 50; 
     // total valaut for found            
-    uint256 public fndValaut_;  
+    uint256 private fndValaut_;  
     // total airdrop in this round                  
-    uint256 public airdrop_; 
+    uint256 private airdrop_; 
     // amount of players who in airdrop
-    uint256 public airdropCount_ = 5;   
+    uint256 private airdropCount_ = 5;   
 
     ERC20 public erc20;
 
@@ -39,7 +39,7 @@ contract GuessCore is ProductOwnership, GuessEvents {
     // last player number;
     uint256 public playerID_; 
     //rid returns pagesize
-    uint256 public pageSize_ = 50;   
+    uint256 private pageSize_ = 50;   
 //*******
 // PLAYER DATA 
 //*******
